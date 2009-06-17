@@ -51,6 +51,7 @@ class_has interface => (
 );
 
 class_has ai => (
+    traits    => [qw/TAEB::Persistent/],
     is        => 'rw',
     isa       => 'TAEB::AI',
     handles   => [qw(want_item currently)],
