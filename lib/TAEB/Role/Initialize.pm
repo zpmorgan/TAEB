@@ -32,7 +32,7 @@ after initialize => sub {
 
         next unless $class;
         # don't go into non-cmop classes
-        next unless $class->can('meta');
+        next unless Class::MOP::does_metaclass_exist($class);
         # don't go into non-moose classes
         next unless $class->meta->can('does_role');
         # don't go into non-taeb classes
