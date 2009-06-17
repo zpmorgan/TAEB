@@ -19,7 +19,7 @@ after initialize => sub {
             my $type_constraint = $attr->type_constraint;
             # XXX: do we care about unions?
             $type_constraint = $type_constraint->type_parameter
-                if $type_constraint->is_a_type_of('Maybe');
+                while $type_constraint->isa('Moose::Meta::TypeConstraint::Parameterized');
             # don't check non-classes
             next unless $type_constraint->is_a_type_of('Object');
             $class = $type_constraint->name;
