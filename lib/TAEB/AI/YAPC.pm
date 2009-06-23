@@ -4,8 +4,9 @@ extends 'TAEB::AI';
 
 sub next_action {
     my $self = shift;
-    $self->currently('searching');
-    return TAEB::Action::Search->new(iterations => 1);
+    $self->currently('random walking');
+    my $direction = (qw(y u h j k l b n))[int rand 8];
+    return TAEB::Action::Move->new(direction => $direction);
 }
 
 __PACKAGE__->meta->make_immutable;
