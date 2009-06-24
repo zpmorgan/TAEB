@@ -19,7 +19,7 @@ after initialize => sub {
             my $type_constraint = $attr->type_constraint;
             # XXX: do we care about unions?
             $type_constraint = $type_constraint->type_parameter
-                if $type_constraint->is_a_type_of('Maybe');
+                while $type_constraint->isa('Moose::Meta::TypeConstraint::Parameterized');
             # don't check non-classes
             next unless $type_constraint->is_a_type_of('Object');
             $class = $type_constraint->name;
@@ -32,7 +32,7 @@ after initialize => sub {
 
         next unless $class;
         # don't go into non-cmop classes
-        next unless $class->can('meta');
+        next unless Class::MOP::does_metaclass_exist($class);
         # don't go into non-moose classes
         next unless $class->meta->can('does_role');
         # don't go into non-taeb classes
