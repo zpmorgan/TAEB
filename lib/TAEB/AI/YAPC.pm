@@ -14,6 +14,12 @@ sub next_action {
         $self->currently('attacking');
         return TAEB::Action::Melee->new(direction => $enemies[0]);
     }
+    $self->currently('pathing to enemy');
+    $path = TAEB::World::Path->first_match(
+        sub { shift->has_enemy },
+        include_endpoints => 1
+    );
+    return $path if $path;
     $self->currently('exploring');
     $path = TAEB::World::Path->first_match(
         sub { shift->unexplored }
