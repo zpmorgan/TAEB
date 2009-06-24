@@ -378,6 +378,27 @@ sub remaining_pits {
     return $remaining_pits;
 }
 
+sub first_unsolved_sokoban_level {
+    my $self = shift;
+    return TAEB->dungeon->shallowest_level(sub {
+        my $level = shift;
+        return $level->known_branch
+            && $level->branch eq 'sokoban'
+            && $self->remaining_pits($level) > 0;
+    });
+}
+
+sub first_solvable_sokoban_level {
+    my $self = shift;
+    my $pathable = shift;
+    return TAEB->dungeon->shallowest_level(sub {
+        my $level = shift;
+        return $level->known_branch
+            && $level->branch eq 'sokoban'
+            && defined $self->next_sokoban_step($level,$pathable);
+    });
+}
+
 sub next_sokoban_step {
     my $self = shift;
     my $level = shift;
@@ -569,6 +590,17 @@ Sokoban level. This is a string giving NetHack's internal name for the
 level. If called in list context, also gives the x and y offset of the
 map from the spoiler. If no level is given, defaults to TAEB's current
 level.
+
+=head2 first_unsolved_sokoban_level -> Level
+
+Returns the lowest level in Sokoban that is not yet completely solved
+but that TAEB has encountered in the past.
+
+=head2 first_solvable_sokoban_level -> Level
+
+Returns the lowest level in Sokoban that can be solved from here
+(i.e. is not yet completely solved and has not been fatally messed up)
+but that TAEB has encountered in the past.
 
 =head2 remaining_pits [Level] -> Int
 
