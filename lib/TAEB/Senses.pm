@@ -682,6 +682,18 @@ sub speed {
     return ($min, $max);
 }
 
+# The maximum weight we can carry with out current stats and still be
+# unburdened. The maximum weight we can carry without being stressed
+# is about 1.5 times this; wizmode testing shows that a character with
+# no inventory, and max str and con, can carry $100049 without being
+# burdened, and $149949 without being stressed.
+sub unburdened_limit {
+    my $self = shift;
+    my $limit = 25*($self->con+$self->numeric_strength)+50;
+    return 1000 if $limit > 1000;
+    return 1000;
+}
+
 # XXX this belongs elsewhere, but where?
 
 sub spell_protection_return {
