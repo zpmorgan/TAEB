@@ -18,6 +18,10 @@ use TAEB::Action;
 use TAEB::Publisher;
 use TAEB::Debug;
 
+with (
+    'TAEB::Role::Persistency',
+);
+
 our $VERSION = '0.05';
 
 class_has persistent_data => (
