@@ -369,7 +369,7 @@ sub recognise_sokoban_variant {
 
 sub remaining_pits {
     my $self = shift;
-    my $level = shift // TAEB->current_level;
+    my $level = shift || TAEB->current_level;
     my $remaining_pits = 0;
     $level->each_tile(sub {
         my $t = shift;
