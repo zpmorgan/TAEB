@@ -451,7 +451,7 @@ sub change_type {
 
     return if $self->type eq $newtype && $self->floor_glyph eq $newglyph;
     return if $self->level->is_rogue && $self->type eq 'stairsup';
-    TAEB->send_message('tile_update' => $self);
+    TAEB->announce('tile_type_change' => 'tile' => $self);
 
     $self->level->unregister_tile($self);
 
@@ -732,6 +732,7 @@ sub _remove_level_item {
 # }}}
 
 # keep track of which tiles are interesting on the level object
+# also announce if it became interesting
 before set_interesting => sub {
     my $self = shift;
     my $set = shift(@_) ? 1 : 0;
@@ -743,6 +744,7 @@ before set_interesting => sub {
 
     if ($set) {
         $self->level->register_tile($self => 'interesting');
+        TAEB->publisher->announce(tile_became_interesting => tile => $self);
     }
     else {
         $self->level->unregister_tile($self => 'interesting');
