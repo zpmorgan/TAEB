@@ -72,6 +72,9 @@ $SIG{TERM} = sub {
 $SIG{USR1} = sub {
     TAEB->debugger->console->repl(undef);
 };
+$SIG{USR2} = sub {
+    die "Dying on user request to give a stack trace";
+};
 
 $| = 1;
 
