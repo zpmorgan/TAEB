@@ -459,7 +459,7 @@ sub change_draw_mode {
 
     my $menu = TAEB::Display::Menu->new(
         description => "Change draw mode",
-        items       => [ map { $_->{description} } values %modes ],
+        items       => [ sort map { $_->{description} } values %modes ],
         select_type => 'single',
     );
 
