@@ -746,7 +746,7 @@ sub setup_handlers {
             TAEB->log->perl($error, level => $level);
             # Use the emergency versions of quit/save here, not the actions.
             if (defined TAEB->config && defined TAEB->config->contents &&
-                TAEB->config->contents->{'unattended'}) {
+                TAEB->config->contents->{'kiosk_mode'}) {
                 TAEB->quit;
                 TAEB->destroy_saved_state;
             } else {

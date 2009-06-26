@@ -33,7 +33,7 @@ debug:
     console:
         readline: Gnu
 
-unattended: 0
+kiosk_mode: 0
 
 other_config:
     - ~/.taeb/secret_config.yml
