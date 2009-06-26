@@ -19,6 +19,8 @@ sub name {
     return lc $class;
 }
 
+sub immediate { 0 }
+
 use Module::Pluggable (
     require     => 1,
     sub_name    => 'announcement_classes',
