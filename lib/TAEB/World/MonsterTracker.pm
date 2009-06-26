@@ -50,15 +50,18 @@ use TAEB::OO;
 use overload %TAEB::Meta::Overload::default;
 
 has level => (
+    is       => 'ro',
     isa      => 'TAEB::World::Level',
     weak_ref => 1,
 );
 
 has visible => (
+    is     => 'ro',
     isa    => 'ArrayRef[TAEB::World::Monster]',
 );
 
 has pool => (
+    is     => 'ro',
     isa    => 'ArrayRef[TAEB::World::Monster]',
 );
 
