@@ -9,7 +9,6 @@ my @slots = ('a' .. 'z', 'A' .. 'Z');
 
 has _spells => (
     traits    => ['MooseX::AttributeHelpers::Trait::Collection::Hash'],
-    is        => 'bare',
     isa       => 'HashRef[TAEB::World::Spell]',
     default   => sub { {} },
     provides  => {
