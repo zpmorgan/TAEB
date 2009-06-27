@@ -93,6 +93,7 @@ has twitter => (
                 $args{message} =~ s/\n.*//s;
                 return sprintf "%s (T%s): %s",
                             TAEB->loaded_persistent_data
+                         && defined TAEB->senses # i.e. not yet cleaned up
                           ? (TAEB->name, TAEB->turn)
                           : ('?', '-'),
                             $args{message};
@@ -211,7 +212,10 @@ sub _format {
     my ($sec, $min, $hour, $mday, $mon, $year) = localtime;
 
     return sprintf "<T%s> %04d-%02d-%02d %02d:%02d:%02d %s\n",
-                   (TAEB->loaded_persistent_data ? TAEB->turn : '-'),
+                   (TAEB->loaded_persistent_data
+                && defined TAEB->senses # i.e. not yet cleaned up
+                 ? TAEB->turn
+                 : '-'),
                    $year + 1900,
                    $mon + 1,
                    $mday,
