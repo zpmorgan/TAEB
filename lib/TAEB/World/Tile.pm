@@ -298,21 +298,21 @@ sub is_inherently_unwalkable {
 
     # current tile is always walkable, but don't check it if our caller
     # asked us not to (that check is rather slow)
-    return 1 if !defined($dont_check_current_tile)
+    return 0 if !defined($dont_check_current_tile)
              && $self == TAEB->current_tile;
 
     # traps are unpathable in Sokoban
-    return 0 if $self->type eq 'trap'
+    return 1 if $self->type eq 'trap'
              && $self->level->known_branch
              && $self->level->branch eq 'sokoban';
 
     # we can path through unlit areas that we haven't seen as rock for sure yet
     # if we're blind, then all bets are off
-    return 1 if $through_unknown
+    return 0 if $through_unknown
              && !TAEB->is_blind
              && $self->type eq 'unexplored';
 
-    return $is_walkable{ $self->type };
+    return not $is_walkable{ $self->type };
 }
 
 sub update_lit {
