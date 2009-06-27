@@ -2,6 +2,7 @@ package TAEB::Spoilers::Combat;
 use strict;
 use warnings;
 use TAEB::Util 'dice';
+use Scalar::Util 'blessed';
 
 # XXX: eventually all of these should be modified to possibly take into account
 # the monster we're attacking, so we don't sit around whiffing at a shade and
