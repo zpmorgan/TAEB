@@ -118,7 +118,8 @@ class_has log => (
             max_level => 'warning',
             callbacks => sub {
                 my %args = @_;
-                if (!TAEB->display->to_screen) {
+                if (!defined TAEB->display
+                 || !TAEB->display->to_screen) {
                     local $SIG{__WARN__};
                     warn $args{message};
                 }
@@ -129,7 +130,8 @@ class_has log => (
             min_level => 'error',
             callbacks => sub {
                 my %args = @_;
-                if (!TAEB->display->to_screen) {
+                if (!defined TAEB->display
+                 || !TAEB->display->to_screen) {
                     local $SIG{__WARN__};
                     confess $args{message};
                 }
