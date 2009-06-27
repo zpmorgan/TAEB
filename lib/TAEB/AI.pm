@@ -64,12 +64,12 @@ sub respond_continue_lifting { "y" }
 
 sub respond_wish {
     # We all know how much TAEB loves Elbereth. Let's give it Elbereth's best buddy.
-    return "blessed fixed +3 Magicbane\n" unless TAEB->get_artifact("Magicbane");
+    return "blessed fixed +3 Magicbane\n" unless TAEB->seen_artifact("Magicbane");
 
     # Half physical damage? Don't mind if I do! (Now with added grease for Eidolos!)
     return "blessed fixed greased Master Key of Thievery\n"
         if TAEB->align eq 'Cha'
-        && !TAEB->get_artifact('Master Key of Thievery');
+        && !TAEB->seen_artifact('Master Key of Thievery');
 
     # We can always use more AC.
     return "blessed fixed greased +3 dwarvish mithril-coat\n" unless TAEB->has_item(qr/mithril/);
