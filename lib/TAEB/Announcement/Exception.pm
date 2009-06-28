@@ -1,4 +1,4 @@
-package TAEB::Announcement::Query;
+package TAEB::Announcement::Exception;
 use TAEB::OO;
 extends 'TAEB::Announcement';
 

@@ -86,7 +86,12 @@ sub announce {
 sub send_message {
     my $self = shift;
 
-    return $self->_enqueue_message(@_) if $self->is_paused;
+    if ($self->is_paused) {
+        # Some announcements (like queries) cannot be delayed
+        unless (@_ == 1 && blessed($_[0]) && $_[0]->isa('TAEB::Announcement') && $_[0]->is_immediate) {
+            return $self->_enqueue_message(@_);
+        }
+    }
 
     my $name = shift;
     my @args = @_;

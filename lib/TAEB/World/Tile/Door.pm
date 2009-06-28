@@ -27,8 +27,7 @@ sub blocked_door {
         my $tile = shift;
         return if $tile->type eq 'rock' || $tile->type eq 'unexplored';
         $orthogonal_tiles++;
-        return if $tile->is_walkable && $tile->type ne 'trap';
-        $blocked_door++;
+        $blocked_door++ if $tile->is_inherently_unwalkable;
     });
 
     # all visible orthogonal tiles to the door must be unblocked, and if both
