@@ -791,6 +791,7 @@ our @exceptions = (
 
 our @location_requests = (
     qr/^To what position do you want to be teleported\?/ => 'controlled_tele',
+    qr/^Where do you want to travel to\?/ => 'travel',
 );
 
 has messages => (
