@@ -479,6 +479,10 @@ our @msg_regex = (
             [item_price => sub { TAEB->new_item($1), $2 } ],
     ],
     [
+        qr/^(.*), no charge/,
+            [item_price => sub { TAEB->new_item($1), 0 } ],
+    ],
+    [
         qr/^There are (?:several|many) (?:more )?objects here\./,
             [check => 'floor'],
     ],
@@ -1008,6 +1012,8 @@ sub handle_more_menus {
         $each = sub {
             /^\s*(.*), (\d+) zorkmids?/ and
                 TAEB->send_message('item_price' => TAEB->new_item($1), $2);
+            /^\s*(.*), no charge/ and
+                TAEB->send_message('item_price' => TAEB->new_item($1));
             return 0;
         }
     }
