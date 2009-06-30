@@ -68,7 +68,7 @@ features(
     # optional modules that enhance TAEB's playing
     'TAEB for server NetHack' => [
         -default => 0,
-        recommends('IO::Socket::Telnet'),
+        recommends('IO::Socket::Telnet::HalfDuplex'),
     ],
     'TAEB for local NetHack' => [
         -default => 0,
