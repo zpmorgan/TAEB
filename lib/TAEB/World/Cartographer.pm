@@ -226,6 +226,10 @@ sub msg_dungeon_feature {
         # if we get a bad_staircase message, we're obviously confused about
         # things, so make sure we don't leave other_side pointing to strange
         # places
+        TAEB->current_tile->other_side->clear_other_side
+            if TAEB->current_tile->can('other_side')
+            && TAEB->current_tile->other_side
+            && TAEB->current_tile->other_side->can('clear_other_side');
         TAEB->current_tile->clear_other_side
             if TAEB->current_tile->can('clear_other_side');
     }

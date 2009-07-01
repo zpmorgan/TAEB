@@ -20,7 +20,9 @@ before done => sub {
         $start->other_side($current);
     }
 
-    if ($current->type eq 'obscured') {
+    # If we changed level, then connect the dungeon graph.
+    if ($current->type eq 'obscured' &&
+        $start->level != TAEB->current_level) {
         $current->change_type($self->complement_type);
         $current->other_side($start);
     }
