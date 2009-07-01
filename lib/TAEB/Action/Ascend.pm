@@ -15,14 +15,16 @@ before done => sub {
     my $start   = $self->starting_tile;
     my $current = TAEB->current_tile;
 
-    if ($start->isa('TAEB::World::Tile::Stairs') && !$start->other_side) {
+    return if $current->level->z == $start->level->z;
+
+    if (($start->isa('TAEB::World::Tile::Stairs') && !$start->other_side) ||
+        $start->other_side == $start) {
         TAEB->log->action("Setting the other_side of $start to " . $current);
         $start->other_side($current);
     }
 
     # If we changed level, then connect the dungeon graph.
-    if ($current->type eq 'obscured' &&
-        $start->level != TAEB->current_level) {
+    if ($current->type eq 'obscured') {
         $current->change_type($self->complement_type);
         $current->other_side($start);
     }
