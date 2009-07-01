@@ -1013,7 +1013,7 @@ sub handle_more_menus {
             /^\s*(.*), (\d+) zorkmids?/ and
                 TAEB->send_message('item_price' => TAEB->new_item($1), $2);
             /^\s*(.*), no charge/ and
-                TAEB->send_message('item_price' => TAEB->new_item($1));
+                TAEB->send_message('item_price' => TAEB->new_item($1), 0);
             return 0;
         }
     }
