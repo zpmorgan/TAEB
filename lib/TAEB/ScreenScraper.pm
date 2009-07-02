@@ -299,6 +299,8 @@ our %msg_string = (
         [dungeon_feature => trap => "rolling boulder trap"],
     "You activated a magic portal!" =>
         [dungeon_feature => trap => "magic portal"],
+    "You hear a CRASH! beneath you." =>
+        [dungeon_feature => trap => 0],
     'You are suddenly in familiar surroundings.' =>
         [quest_entrance => 'Arc'],
     'Warily you scan your surroundings,' =>
