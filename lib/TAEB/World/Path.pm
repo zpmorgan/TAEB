@@ -4,6 +4,8 @@ use Heap::Simple;
 use TAEB::Util qw/delta2vi deltas sum max refaddr/;
 use Time::HiRes 'time';
 
+with 'TAEB::Role::Actionable';
+
 has from => (
     is       => 'ro',
     isa      => 'TAEB::World::Tile',
@@ -353,6 +355,12 @@ sub contains_tile {
     my $tile = shift;
 
     return $self->tiles->{refaddr $tile};
+}
+
+use TAEB::Action::Move;
+sub as_action {
+    my $self = shift;
+    return TAEB::Action::Move->new(path => $self);
 }
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
