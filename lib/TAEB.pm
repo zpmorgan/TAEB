@@ -278,11 +278,14 @@ sub next_action {
     my $action = $self->ai->next_action(@_)
         or confess $self->ai . " did not return a next_action!";
 
-    if ($action->isa('TAEB::World::Path')) {
-        return TAEB::Action::Move->new(path => $action);
+    return $action if $action->isa('TAEB::Action');
+
+    # Not an action, but can become one.
+    if ($action->does('TAEB::Role::Actionable')) {
+        return $action->as_action;
     }
 
-    return $action;
+    confess $self->ai . "'s next_action returned a non-action!";
 }
 
 sub iterate {
