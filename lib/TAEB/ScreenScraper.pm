@@ -577,7 +577,7 @@ our @msg_regex = (
             ['check' => 'discoveries'],
     ],
     [   # Avoid matching shopkeeper name by checking for capital lettering.
-        qr/Welcome(?: again)? to(?> [A-Z]\S+)+ ([a-z ]+)!/ =>
+        qr/Welcome(?: again)? to(?> [A-Z]\S+)+ ([a-z -]+)!/ =>
             ['enter_room',
              sub {
                 (
@@ -791,6 +791,7 @@ our @prompts = (
 our @exceptions = (
     qr/^You don't have that object/             => 'missing_item',
     qr/^You don't have anything to (?:zap|eat)/ => 'missing_item',
+    qr/^You don't have anything to use or apply/=> 'missing_item',
     qr/^You don't have anything else to wear/   => 'missing_item',
     qr/^You are too hungry to cast that spell/  => 'hunger_cast',
 );
