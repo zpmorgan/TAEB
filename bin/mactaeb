@@ -115,7 +115,6 @@ if ($options{interface} eq 'Telnet') {
 
 my $config = Dump(\%options);
 # TODO: Dump $config to a file
-# TODO: Quote $^X and $Bin/taeb
 
-system("osascript", "-e", qq{tell application "Terminal" to do script "$^X $Bin/taeb"});
+system("osascript", "-e", qq{tell application "Terminal" to do script "'$^X' '-I$FindBin::Bin/lib' '-Mlocal::lib=$FindBin::Bin/extlib' '$Bin/taeb'"});
 
