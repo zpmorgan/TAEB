@@ -357,7 +357,6 @@ sub contains_tile {
     return $self->tiles->{refaddr $tile};
 }
 
-use TAEB::Action::Move;
 sub as_action {
     my $self = shift;
     return TAEB::Action::Move->new(path => $self);
