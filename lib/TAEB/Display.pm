@@ -2,6 +2,9 @@ package TAEB::Display;
 use TAEB::OO;
 use TAEB::Display::Color;
 use TAEB::Display::Menu;
+use MooseX::ABC;
+
+requires 'get_key';
 
 # whether or not this output writes to the terminal: if it does, we don't want
 # to also be sending warnings/errors there, for example.
@@ -32,7 +35,6 @@ sub display_topline { }
 
 sub place_cursor { }
 
-sub get_key { die "get_key not implemented for " . blessed(shift) }
 sub try_key { }
 
 sub change_draw_mode { }

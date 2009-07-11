@@ -1,5 +1,6 @@
 package TAEB::Interface;
 use TAEB::OO;
+use MooseX::ABC;
 
 has read_iterations => (
     is      => 'ro',
