@@ -367,6 +367,38 @@ sub recognise_sokoban_variant {
     return $variant;
 }
 
+sub remaining_pits {
+    my $self = shift;
+    my $level = shift || TAEB->current_level;
+    my $remaining_pits = 0;
+    $level->each_tile(sub {
+        my $t = shift;
+        $remaining_pits++ if $t->type eq 'trap';
+    });
+    return $remaining_pits;
+}
+
+sub first_unsolved_sokoban_level {
+    my $self = shift;
+    return TAEB->dungeon->shallowest_level(sub {
+        my $level = shift;
+        return $level->known_branch
+            && $level->branch eq 'sokoban'
+            && $self->remaining_pits($level) > 0;
+    });
+}
+
+sub first_solvable_sokoban_level {
+    my $self = shift;
+    my $pathable = shift;
+    return TAEB->dungeon->shallowest_level(sub {
+        my $level = shift;
+        return $level->known_branch
+            && $level->branch eq 'sokoban'
+            && defined $self->next_sokoban_step($level,$pathable);
+    });
+}
+
 sub next_sokoban_step {
     my $self = shift;
     my $level = shift;
@@ -395,11 +427,7 @@ sub next_sokoban_step {
     my $solution = $self->level_maps->{$variant}->{'solution'};
 
     # Find out how many pits have been filled already.
-    my $remaining_pits = 0;
-    $level->each_tile(sub {
-        my $t = shift;
-        $remaining_pits++ if $t->type eq 'trap';
-    });
+    my $remaining_pits = $self->remaining_pits($level);
 
     return if $remaining_pits == 0; # already solved
 
@@ -562,6 +590,22 @@ Sokoban level. This is a string giving NetHack's internal name for the
 level. If called in list context, also gives the x and y offset of the
 map from the spoiler. If no level is given, defaults to TAEB's current
 level.
+
+=head2 first_unsolved_sokoban_level -> Level
+
+Returns the lowest level in Sokoban that is not yet completely solved
+but that TAEB has encountered in the past.
+
+=head2 first_solvable_sokoban_level -> Level
+
+Returns the lowest level in Sokoban that can be solved from here
+(i.e. is not yet completely solved and has not been fatally messed up)
+but that TAEB has encountered in the past.
+
+=head2 remaining_pits [Level] -> Int
+
+Returns the number of pits/holes remaining on level Level (defaulting
+to the current level). When this is 0, the level is solved.
 
 =head2 next_sokoban_step Level [Pathable] -> Maybe Tile
 

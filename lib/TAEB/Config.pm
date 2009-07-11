@@ -342,7 +342,7 @@ TAEB::Config
     # Set this to 1 if you want to run a buggy TAEB overnight; it causes TAEB
     # to quit instead of saving on errors; if your TAEB is not particularly
     # buggy, you might want to leave this this at 0 so the full state is kept.
-    #unattended: 0
+    #kiosk_mode: 0
 
     #### External config ######
     # Specify other config files to load here - for example, config files

@@ -14,13 +14,16 @@ subscribe door => sub {
     my $event = shift;
 
     my $state = $event->state;
-    my $tile  = $event->tile;
+    my $door  = $event->tile;
+
+    # The tile may have been changed between the announcement's origin and now
+    return unless $door->isa('TAEB::World::Tile::Door');
 
     if ($state eq 'locked') {
-        $tile->state('locked');
+        $door->state('locked');
     }
     elsif ($state eq 'resists') {
-        $tile->state('unlocked');
+        $door->state('unlocked');
     }
 };
 

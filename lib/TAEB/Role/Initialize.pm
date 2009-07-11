@@ -39,7 +39,7 @@ after initialize => sub {
         next unless $class->meta->does_role(__PACKAGE__);
 
         my $value = $attr->get_read_method_ref->($self);
-        next unless blessed($value);
+        next unless blessed $value;
         $value->initialize;
     }
 };

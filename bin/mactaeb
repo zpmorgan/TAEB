@@ -110,5 +110,7 @@ if ($options{interface} eq 'Telnet') {
 }
 
 my $config = Dump(\%options);
-exec $^X, "$Bin/taeb", "--config=$config";
+# TODO: Dump $config to a file
+# TODO: Quote $^X and $Bin/taeb
+system(qq{osascript -e 'tell application "Terminal" to do script "$^X $Bin/taeb"'});
 

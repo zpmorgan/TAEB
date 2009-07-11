@@ -1,13 +1,14 @@
 package TAEB::World::Spells;
 use TAEB::OO;
 use TAEB::Util 'first';
+use TAEB::World::Spell;
 
 use overload %TAEB::Meta::Overload::default;
 
 my @slots = ('a' .. 'z', 'A' .. 'Z');
 
 has _spells => (
-    metaclass => 'Collection::Hash',
+    traits    => ['MooseX::AttributeHelpers::Trait::Collection::Hash'],
     isa       => 'HashRef[TAEB::World::Spell]',
     default   => sub { {} },
     provides  => {

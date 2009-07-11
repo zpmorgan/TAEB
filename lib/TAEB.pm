@@ -118,7 +118,8 @@ class_has log => (
             max_level => 'warning',
             callbacks => sub {
                 my %args = @_;
-                if (!TAEB->display->to_screen) {
+                if (!defined TAEB->display
+                 || !TAEB->display->to_screen) {
                     local $SIG{__WARN__};
                     warn $args{message};
                 }
@@ -129,7 +130,8 @@ class_has log => (
             min_level => 'error',
             callbacks => sub {
                 my %args = @_;
-                if (!TAEB->display->to_screen) {
+                if (!defined TAEB->display
+                 || !TAEB->display->to_screen) {
                     local $SIG{__WARN__};
                     confess $args{message};
                 }
@@ -254,7 +256,8 @@ class_has item_pool => (
     isa     => 'TAEB::World::ItemPool',
     default => sub { TAEB::World::ItemPool->new },
     handles => {
-        get_artifact => 'get_artifact',
+        get_artifact  => 'get_artifact',
+        seen_artifact => 'get_artifact',
     },
 );
 
@@ -274,11 +277,14 @@ sub next_action {
     my $action = $self->ai->next_action(@_)
         or confess $self->ai . " did not return a next_action!";
 
-    if ($action->isa('TAEB::World::Path')) {
-        return TAEB::Action::Move->new(path => $action);
+    return $action if $action->isa('TAEB::Action');
+
+    # Not an action, but can become one.
+    if ($action->does('TAEB::Role::Actionable')) {
+        return $action->as_action;
     }
 
-    return $action;
+    confess $self->ai . "'s next_action returned a non-action!";
 }
 
 sub iterate {
@@ -746,7 +752,7 @@ sub setup_handlers {
             TAEB->log->perl($error, level => $level);
             # Use the emergency versions of quit/save here, not the actions.
             if (defined TAEB->config && defined TAEB->config->contents &&
-                TAEB->config->contents->{'unattended'}) {
+                TAEB->config->contents->{'kiosk_mode'}) {
                 TAEB->quit;
                 TAEB->destroy_saved_state;
             } else {

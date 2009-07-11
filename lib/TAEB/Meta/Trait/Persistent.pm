@@ -15,7 +15,11 @@ before _process_options => sub {
 
         # do we have the value from persistency?
         my $value = delete TAEB->persistent_data->{$name};
-        return $value if defined $value;
+        if (defined($value)) {
+            # For some reason Storable doesn't load TAEB::AI::Demo
+            Class::MOP::load_class(blessed($value)) if blessed($value);
+            return $value;
+        }
 
         # otherwise, use the old default
         ref($old_default) eq 'CODE' ? $old_default->($self, @_) : $old_default;
