@@ -2,17 +2,14 @@ package TAEB::Action::Travel;
 use TAEB::OO;
 extends 'TAEB::Action';
 
+use constant command => '_';
+
 has target_tile => (
     is       => 'ro',
     isa      => 'TAEB::World::Tile',
     provided => 1,
     required => 1,
 );
-
-sub command {
-    my $self = shift;
-    return "_";
-}
 
 sub location_controlled_tele {
     my $self = shift;
@@ -26,16 +23,13 @@ sub location_controlled_tele {
     return $adjacent[0];
 }
 
-sub location_travel {
-    my $self = shift;
-    return $self->target_tile;
-}
+sub location_travel { shift->target_tile }
 
 sub done {
     my $self = shift;
     # NetHack doesn't show or tell us what's on the floor when we
     # travel. So we have to check manually.
-    TAEB->send_message('check', 'floor');
+    TAEB->send_message(check => 'floor');
 }
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
