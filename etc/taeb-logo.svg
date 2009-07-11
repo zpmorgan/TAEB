@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="400"
+   height="400"
+   id="svg2385"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docname="taeb-logo.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/sean/Desktop/taeb-icon/taeb-icon.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs2387">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective2393" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.235"
+     inkscape:cx="208.08131"
+     inkscape:cy="200"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="true"
+     inkscape:snap-global="false"
+     inkscape:window-width="983"
+     inkscape:window-height="884"
+     inkscape:window-x="251"
+     inkscape:window-y="41">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2401"
+       visible="true"
+       enabled="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata2390">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:64px;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#004455;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Droid Serif;-inkscape-font-specification:Droid Serif Bold Italic"
+       x="-0.048583031"
+       y="251.61945"
+       id="text5122"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5124"
+         x="-0.048583031"
+         y="251.61945"
+         dx="0 153.03645 -10.526315"
+         style="font-size:160px;fill:#004455">teb</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5126"
+       style="font-size:200px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#782121;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Droid Serif;-inkscape-font-specification:Droid Serif Bold"
+       transform="translate(306.09474,281.04955)"><flowRegion
+         id="flowRegion5128"><rect
+           id="rect5130"
+           width="319.43814"
+           height="332.41025"
+           x="-256.19913"
+           y="-211.31055"
+           style="font-size:200px;font-style:normal;-inkscape-font-specification:Droid Serif Bold;fill:#782121" /></flowRegion><flowPara
+         id="flowPara5132"
+         style="font-size:200px;font-style:normal;font-weight:bold;-inkscape-font-specification:Droid Serif Bold;fill:#782121">@</flowPara></flowRoot>  </g>
+</svg>
