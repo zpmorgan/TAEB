@@ -12,10 +12,10 @@ extends 'TAEB::Announcement';
 # avoiding that would mean that announcements would need to respond to
 # other announcements.
 has tile => (
-    is      => 'ro',
-    isa     => 'Maybe[TAEB::World::Tile]',
-    default => undef,
+    is  => 'ro',
+    isa => 'TAEB::World::Tile',
 );
+
 around tile => sub {
     my $orig = shift;
     my $self = shift;
