@@ -1,5 +1,6 @@
 package TAEB::Announcement;
 use TAEB::OO;
+use MooseX::ABC;
 
 has text => (
     is            => 'ro',

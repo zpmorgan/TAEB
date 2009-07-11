@@ -1,6 +1,6 @@
 package TAEB::Interface::Telnet;
 use TAEB::OO;
-use IO::Socket::Telnet;
+use IO::Socket::Telnet::HalfDuplex;
 
 extends 'TAEB::Interface';
 
@@ -41,14 +41,14 @@ has register => (
 
 has socket => (
     is      => 'rw',
-    isa     => 'IO::Socket::Telnet',
+    isa     => 'IO::Socket::Telnet::HalfDuplex',
     lazy    => 1,
     default => sub {
         my $self = shift;
 
         TAEB->log->interface("Connecting to " . $self->server . ".");
 
-        my $socket = IO::Socket::Telnet->new(
+        my $socket = IO::Socket::Telnet::HalfDuplex->new(
             PeerAddr => $self->server,
             PeerPort => $self->port,
         );
@@ -78,27 +78,8 @@ has sent_login => (
 
 augment read => sub {
     my $self = shift;
-    my $buffer;
 
-    $self->socket->do(chr(99));
-    ${*{$self->socket}}{got_pong} = 0;
-
-    eval {
-        local $SIG{__DIE__};
-
-        while (1) {
-            my $b;
-            defined $self->socket->recv($b, 4096, 0) and do {
-                $buffer .= $b;
-                die "alarm\n" if ${*{$self->socket}}{got_pong};
-                next;
-            };
-
-            die "Disconnected from server: $!" unless $!{EINTR};
-        }
-    };
-
-    die $@ if $@ !~ /^alarm\n/;
+    my $buffer = $self->socket->read;
 
     if (!$self->sent_login && $buffer =~ /Not logged in\./) {
         if ($self->register) {
@@ -132,7 +113,6 @@ sub telnet_negotiation {
     my $option = shift;
 
     if ($option =~ / 99$/) {
-        ${*$self}{got_pong} = 1;
         return '';
     }
 

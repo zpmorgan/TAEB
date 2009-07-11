@@ -7,6 +7,7 @@ all_from       'lib/TAEB.pm';
 
 # the object system
 requires 'Moose'                       => 0.74;
+requires 'MooseX::ABC'                 => 0.02;
 requires 'MooseX::AttributeHelpers'    => 0.09;
 requires 'MooseX::ClassAttribute'      => 0.07;
 requires 'MooseX::Role::Parameterized' => 0.06;
@@ -68,7 +69,7 @@ features(
     # optional modules that enhance TAEB's playing
     'TAEB for server NetHack' => [
         -default => 0,
-        recommends('IO::Socket::Telnet'),
+        recommends('IO::Socket::Telnet::HalfDuplex'),
     ],
     'TAEB for local NetHack' => [
         -default => 0,

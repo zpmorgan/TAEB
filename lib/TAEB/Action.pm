@@ -1,5 +1,8 @@
 package TAEB::Action;
 use TAEB::OO;
+use MooseX::ABC;
+
+requires 'command';
 
 has aborted => (
     is      => 'rw',
@@ -12,11 +15,6 @@ has starting_tile => (
     isa     => 'TAEB::World::Tile',
     default => sub { TAEB->current_tile },
 );
-
-sub command {
-    my $class = blessed($_[0]) || $_[0];
-    confess "$class must defined a 'command' method.";
-}
 
 sub run { shift->command }
 

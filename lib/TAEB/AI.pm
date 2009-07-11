@@ -1,12 +1,10 @@
 package TAEB::AI;
 use TAEB::OO;
+use MooseX::ABC;
+
+requires 'next_action';
 
 use constant is_human_controlled => 0;
-
-sub next_action {
-    my $class = blessed($_[0]) || $_[0];
-    die "You must override the 'next_action' method in $class";
-}
 
 sub institute {
     TAEB->publisher->subscribe(shift);
