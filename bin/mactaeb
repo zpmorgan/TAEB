@@ -11,7 +11,7 @@ $ENV{PATH} = "$ENV{PATH}:/opt/local/bin:/usr/games";
 # XXX: I tried using Module::Install::Can::can_run but it always returned true..
 if (`which nethack`) {
     my $dialog = join ' ', split /\n/, q{
-        /Applications/CocoaDialog.app/Contents/MacOS/CocoaDialog
+        CocoaDialog.app/Contents/MacOS/CocoaDialog
         msgbox
         --button1 Local
         --button2 Telnet
@@ -35,7 +35,7 @@ else {
 if ($options{interface} eq 'Telnet') {
     # I would use standard-inputbox here except they use 'Ok' instead of 'OK' :(
     my $server_dialog = join ' ', split /\n/, q{
-        /Applications/CocoaDialog.app/Contents/MacOS/CocoaDialog
+        CocoaDialog.app/Contents/MacOS/CocoaDialog
         inputbox
         --button1 OK
         --button2 Cancel
@@ -51,7 +51,7 @@ if ($options{interface} eq 'Telnet') {
 
     # ask for name
     my $name_dialog = join ' ', split /\n/, q{
-        /Applications/CocoaDialog.app/Contents/MacOS/CocoaDialog
+        CocoaDialog.app/Contents/MacOS/CocoaDialog
         inputbox
         --button1 "New Account"
         --button2 "Existing Account"
@@ -74,7 +74,7 @@ if ($options{interface} eq 'Telnet') {
 
     # ask for password
     my $password_dialog = join ' ', split /\n/, qq{
-        /Applications/CocoaDialog.app/Contents/MacOS/CocoaDialog
+        CocoaDialog.app/Contents/MacOS/CocoaDialog
         inputbox
         --button1 OK
         --button2 Cancel
@@ -95,7 +95,7 @@ if ($options{interface} eq 'Telnet') {
     # ask for email address
     if ($register) {
         my $email_dialog = join ' ', split /\n/, qq{
-            /Applications/CocoaDialog.app/Contents/MacOS/CocoaDialog
+            CocoaDialog.app/Contents/MacOS/CocoaDialog
             inputbox
             --button1 OK
             --button2 Cancel
