@@ -55,18 +55,19 @@ class_has ai => (
     isa       => 'TAEB::AI',
     handles   => [qw(want_item currently)],
     predicate => 'has_ai',
+    writer    => 'set_ai', # for efficiency when TAEB->ai is in the inner loop
     lazy      => 1,
     default   => sub {
         my $ai = TAEB->config->get_ai_class->new;
         $ai->institute; # default doesn't fire triggers
         $ai;
     },
-    trigger   => sub {
-        my (undef, $ai) = @_;
-        TAEB->log->main("Now using AI $ai.");
-        $ai->institute;
-    },
 );
+after set_ai => sub {
+    my (undef, $ai) = @_;
+    TAEB->log->main("Now using AI $ai.");
+    $ai->institute;
+};
 
 class_has scraper => (
     is       => 'ro',
@@ -179,7 +180,7 @@ class_has senses => (
     is        => 'ro',
     isa       => 'TAEB::Senses',
     default   => sub { TAEB::Senses->new },
-    handles   => qr/^(?!_check_|msg_|update|initialize|config)/,
+    handles   => qr/^(?!_check_|msg_|subscription_|update|initialize|config)/,
     predicate => 'has_senses',
 );
 
@@ -602,28 +603,26 @@ sub complain {
 }
 
 # allow the user to say TAEB->ai("human") and have it DTRT
-around ai => sub {
+around set_ai => sub {
     my $orig = shift;
     my $self = shift;
 
-    if (@_) {
-        $self->ai->deinstitute
-            if $self->has_ai;
+    $self->ai->deinstitute
+        if $self->has_ai;
 
-        if ($_[0] =~ /^\w+$/) {
-            my $name = shift;
+    if ($_[0] =~ /^\w+$/) {
+        my $name = shift;
 
-            # guess the case unless they tell us what it is (because of
-            # ScoreWhore)
-            $name = "\L\u$name" if $name eq lc $name;
+        # guess the case unless they tell us what it is (because of
+        # ScoreWhore)
+        $name = "\L\u$name" if $name eq lc $name;
 
-            $name = "TAEB::AI::$name";
+        $name = "TAEB::AI::$name";
 
-            (my $file = "$name.pm") =~ s{::}{/}g;
-            require $file;
+        (my $file = "$name.pm") =~ s{::}{/}g;
+        require $file;
 
-            return $self->$orig($name->new);
-        }
+        return $self->$orig($name->new);
     }
 
     return $self->$orig(@_);

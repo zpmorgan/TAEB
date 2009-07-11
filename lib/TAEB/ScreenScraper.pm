@@ -299,6 +299,8 @@ our %msg_string = (
         [dungeon_feature => trap => "rolling boulder trap"],
     "You activated a magic portal!" =>
         [dungeon_feature => trap => "magic portal"],
+    "You hear a CRASH! beneath you." =>
+        [dungeon_feature => trap => 0],
     'You are suddenly in familiar surroundings.' =>
         [quest_entrance => 'Arc'],
     'Warily you scan your surroundings,' =>
@@ -477,6 +479,10 @@ our @msg_regex = (
     [
         qr/^(.*), price (\d+) zorkmids?(?: each)?/,
             [item_price => sub { TAEB->new_item($1), $2 } ],
+    ],
+    [
+        qr/^(.*), no charge/,
+            [item_price => sub { TAEB->new_item($1), 0 } ],
     ],
     [
         qr/^There are (?:several|many) (?:more )?objects here\./,
@@ -791,6 +797,7 @@ our @exceptions = (
 
 our @location_requests = (
     qr/^To what position do you want to be teleported\?/ => 'controlled_tele',
+    qr/^Where do you want to travel to\?/ => 'travel',
 );
 
 has messages => (
@@ -1007,6 +1014,8 @@ sub handle_more_menus {
         $each = sub {
             /^\s*(.*), (\d+) zorkmids?/ and
                 TAEB->send_message('item_price' => TAEB->new_item($1), $2);
+            /^\s*(.*), no charge/ and
+                TAEB->send_message('item_price' => TAEB->new_item($1), 0);
             return 0;
         }
     }

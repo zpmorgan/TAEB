@@ -15,7 +15,7 @@ parameter tile_subtype => (
 
 parameter target_type => (
     is       => 'ro',
-    isa      => (enum ['local', 'direction']),
+    isa      => (enum ['local', 'direction', 'next']),
     required => 1,
 );
 
@@ -37,6 +37,11 @@ role {
         }
         elsif ($p->target_type eq 'direction') {
             method _build_target_tile => sub { TAEB->action->target_tile };
+        }
+        elsif ($p->target_type eq 'next') {
+            method _build_target_tile => sub {
+                TAEB->action->target_tile->at_direction(TAEB->action->command);
+            };
         }
     }
 

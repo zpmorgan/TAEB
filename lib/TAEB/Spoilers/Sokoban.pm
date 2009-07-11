@@ -549,6 +549,8 @@ sub next_sokoban_step {
                         return $temptile;
                     }
                 }
+                TAEB->log->spoilers("Sokoban: Skipped a move to $temptile due ".
+                                    "to pathing problems.");
             }
 
             # Move one step through the plan.

@@ -26,7 +26,7 @@ character:
 
 display_options:
     Curses:
-        color_method: debug
+        color_method: planar_debug
         glyph_method: normal
 
 debug:
