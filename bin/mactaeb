@@ -6,7 +6,7 @@ use YAML::Syck;
 
 my %options;
 
-$ENV{PATH} = "$ENV{PATH}:/usr/bin:/opt/local/bin:/usr/bin/games";
+$ENV{PATH} = "$ENV{PATH}:/opt/local/bin:/usr/games";
 
 # XXX: I tried using Module::Install::Can::can_run but it always returned true..
 if (`which nethack`) {
