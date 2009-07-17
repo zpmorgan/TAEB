@@ -102,6 +102,7 @@ sub notify {
 }
 
 my %standard_modes;
+my ($drawn_cursorx, $drawn_cursory) = (0,0);
 
 sub redraw {
     my $self = shift;
@@ -140,6 +141,8 @@ sub redraw {
             Curses::addch($curses_color | ord($glyph));
         }
     }
+
+    ($drawn_cursorx, $drawn_cursory) = (TAEB->x, TAEB->y);
 
     $self->draw_botl($args{botl}, $args{status});
     $self->place_cursor;
@@ -222,8 +225,8 @@ sub draw_botl {
 
 sub place_cursor {
     my $self = shift;
-    my $x    = shift || TAEB->x;
-    my $y    = shift || TAEB->y;
+    my $x    = shift || $drawn_cursorx;
+    my $y    = shift || $drawn_cursory;
 
     return unless defined($x) && defined($y);
 

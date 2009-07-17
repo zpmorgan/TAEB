@@ -1410,6 +1410,7 @@ sub farlook {
     my $directions = crow_flies($tile->x, $tile->y);
 
     # Clear the messsages buffer so that it isn't double-parsed.
+    my @parsed = $self->parsed_messages;
     TAEB->messages('');
 
     TAEB->write(';' . $directions . '.');
@@ -1417,6 +1418,7 @@ sub farlook {
 
     # use TAEB->messages as it may consist of multiple lines
     my $description = TAEB->messages;
+    @{ $self->parsed_messages } = @parsed; #hide from UI
 
     return $description =~ /^(.)\s*(.*?)\s*\((.*)\)\s*(?:\[(.*)\])?\s*$/
         if wantarray;

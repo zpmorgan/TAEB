@@ -295,10 +295,13 @@ sub iterate {
         $self->log->main("Starting a new step.");
 
         $self->full_input(1);
-        $self->human_input;
 
         my $method = "handle_" . $self->state;
         $self->$method;
+
+        $self->redraw;
+        $self->display_topline;
+        $self->human_input;
     };
 
     if ($@) {
@@ -405,14 +408,8 @@ sub full_input {
     unless ($self->state eq 'logging_in') {
         $self->dungeon->update($main_call);
         $self->senses->update($main_call);
-        $self->publisher->unpause;
-
-        $self->redraw;
-        $self->display_topline;
     }
-    else {
-        $self->publisher->unpause;
-    }
+    $self->publisher->unpause;
 }
 
 sub process_input {
