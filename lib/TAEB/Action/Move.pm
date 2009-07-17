@@ -10,7 +10,7 @@ has path => (
     provided => 1,
 );
 
-has hit_obscured_monster => (
+has [qw/hit_obscured_monster hit_immobile_boulder/] => (
     is      => 'rw',
     isa     => 'Bool',
     default => 0,
@@ -80,6 +80,7 @@ sub done {
     }
 
     return if $self->hit_obscured_monster;
+    return if $self->hit_immobile_boulder;
 
     my $dir = substr($self->directions, 0, 1);
     my ($dx, $dy) = vi2delta($dir);
@@ -151,6 +152,8 @@ subscribe got_item => sub {
 };
 
 sub msg_hidden_monster { shift->hit_obscured_monster(1) }
+
+sub msg_immobile_boulder { shift->hit_immobile_boulder(1) }
 
 sub location_controlled_tele {
     my $self = shift;
