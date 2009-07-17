@@ -37,12 +37,13 @@ before run => sub {
         $y += $dy;
 
         my $tile = TAEB->current_level->at_safe($x, $y) or last;
-        $tile->is_walkable(1) or last;
 
         if ($tile->has_monster) {
             $self->victim_tile($tile);
             last;
         }
+
+        $tile->is_walkable(1) or last;
     }
 };
 
