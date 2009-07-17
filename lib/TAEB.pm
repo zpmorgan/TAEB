@@ -298,17 +298,15 @@ sub iterate {
     my $self = shift;
 
     eval {
-        unless ($self->paused) {
-            $self->log->main("Starting a new step.");
-
-            $self->full_input(1);
-        }
-
         $self->redraw;
         $self->display_topline;
         $self->human_input;
 
         unless ($self->paused) {
+            $self->log->main("Starting a new step.");
+
+            $self->full_input(1);
+
             my $method = "handle_" . $self->state;
             $self->$method;
         }
