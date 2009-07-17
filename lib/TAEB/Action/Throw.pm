@@ -3,7 +3,7 @@ use TAEB::OO;
 extends 'TAEB::Action';
 
 # We do not perform role summation over Monster and Direction because Monster
-# requires target_tile, which is provided *in an attribute* by Direction.
+# requires victim_tile, which is provided *in an attribute* by Direction.
 # requirements and attributes do not play well at all.
 with (
     'TAEB::Action::Role::Direction',
@@ -64,7 +64,7 @@ sub done {
         # if we're throwing at a monster, then the projectile will always stop
         # at the monster's tile (unless we threw multiple and it killed the
         # monster - the subsequent projectiles can fly past)
-        if ($tile == $self->target_tile) {
+        if (defined $self->victim_tile && $tile == $self->victim_tile) {
             last unless $self->threw_multiple
                      && $self->killed;
         }

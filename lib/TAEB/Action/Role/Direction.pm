@@ -1,6 +1,6 @@
 package TAEB::Action::Role::Direction;
 use Moose::Role;
-use TAEB::Util 'none';
+use TAEB::Util 'none', 'vi2delta';
 
 has direction => (
     is       => 'ro',
@@ -16,7 +16,35 @@ has target_tile => (
     default  => sub { TAEB->current_level->at_direction(shift->direction) },
 );
 
+has victim_tile => (
+    is       => 'rw',
+    isa      => 'TAEB::World::Tile',
+    init_arg => undef,
+);
+
 sub respond_what_direction { shift->direction }
+
+before run => sub {
+    my $self = shift;
+
+    my ( $x,  $y) = (TAEB->x, TAEB->y);
+    my ($dx, $dy) = vi2delta($self->direction);
+
+    return unless $dx || $dy;
+
+    while(1) {
+        $x += $dx;
+        $y += $dy;
+
+        my $tile = TAEB->current_level->at_safe($x, $y) or last;
+        $tile->is_walkable(1) or last;
+
+        if ($tile->has_monster) {
+            $self->victim_tile($tile);
+            last;
+        }
+    }
+};
 
 around target_tile => sub {
     my $orig = shift;
@@ -34,9 +62,9 @@ around target_tile => sub {
 sub msg_killed {
     my ($self, $monster_name) = @_;
 
-    return unless defined $self->target_tile;
+    return unless defined $self->victim_tile;
 
-    $self->target_tile->witness_kill($monster_name);
+    $self->victim_tile->witness_kill($monster_name);
 }
 
 no Moose::Role;

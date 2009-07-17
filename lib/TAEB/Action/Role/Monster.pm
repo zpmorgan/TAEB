@@ -1,10 +1,17 @@
 package TAEB::Action::Role::Monster;
 use Moose::Role;
 
-requires 'target_tile';
+requires 'victim_tile';
 
-sub monster     { shift->target_tile->monster }
-sub has_monster { shift->target_tile->has_monster }
+sub monster {
+    my $self = shift;
+    $self->victim_tile && $self->victim_tile->monster;
+}
+
+sub has_monster {
+    my $self = shift;
+    $self->victim_tile && $self->victim_tile->has_monster;
+}
 
 no Moose::Role;
 
