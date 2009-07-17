@@ -79,14 +79,32 @@ sub done {
         return;
     }
 
-    return if $self->hit_obscured_monster;
-    return if $self->hit_immobile_boulder;
-
     my $dir = substr($self->directions, 0, 1);
     my ($dx, $dy) = vi2delta($dir);
 
+    $self->handle_blocking_wall($dx, $dy)
+        if $self->hit_immobile_boulder;
+
+    return if $self->hit_obscured_monster;
+    return if $self->hit_immobile_boulder;
+
     $self->handle_obscured_doors($dx, $dy);
     $self->handle_items_in_rock($dx, $dy);
+}
+
+sub handle_blocking_wall {
+    my $self = shift;
+    my $dx   = shift;
+    my $dy   = shift;
+
+    my $opposed = TAEB->current_level->at_safe(TAEB->x + $dx*2,
+        TAEB->y + $dy*2);
+
+    if ($opposed && $opposed->type eq 'unexplored') {
+        $opposed->change_type('rock' => ' ');
+    } elsif ($opposed && $opposed->is_walkable) {
+        TAEB->log->action("Weird.  Something blocked the boulder, but what?");
+    }
 }
 
 sub handle_items_in_rock {
