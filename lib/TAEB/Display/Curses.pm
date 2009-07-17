@@ -221,6 +221,14 @@ sub draw_botl {
 
     Curses::addstr($status);
     Curses::clrtoeol;
+
+    if (TAEB->paused) {
+        Curses::move(23, 70);
+        Curses::attron(Curses::A_BOLD);
+        Curses::addstr(" -PAUSED-");
+        Curses::attroff(Curses::A_BOLD);
+        Curses::clrtoeol;
+    }
 }
 
 sub place_cursor {

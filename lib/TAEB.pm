@@ -106,6 +106,12 @@ class_has state => (
     },
 );
 
+class_has paused => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
+
 class_has log => (
     is      => 'ro',
     isa     => 'TAEB::Logger',
@@ -292,16 +298,20 @@ sub iterate {
     my $self = shift;
 
     eval {
-        $self->log->main("Starting a new step.");
+        unless ($self->paused) {
+            $self->log->main("Starting a new step.");
 
-        $self->full_input(1);
-
-        my $method = "handle_" . $self->state;
-        $self->$method;
+            $self->full_input(1);
+        }
 
         $self->redraw;
         $self->display_topline;
         $self->human_input;
+
+        unless ($self->paused) {
+            my $method = "handle_" . $self->state;
+            $self->$method;
+        }
     };
 
     if ($@) {
@@ -429,8 +439,10 @@ sub process_input {
 sub human_input {
     my $self = shift;
 
+    my $method = $self->paused ? 'get_key' : 'try_key';
+
     my $c;
-    $c = $self->try_key unless $self->ai->is_human_controlled;
+    $c = $self->$method unless $self->ai->is_human_controlled && !$self->paused;
 
     if (defined $c) {
         my $out = $self->keypress($c);
@@ -446,8 +458,7 @@ sub keypress {
 
     # pause for a key
     if ($c eq 'p') {
-        $self->notify("Paused.", 0);
-        $self->get_key;
+        $self->paused(! $self->paused);
         $self->redraw;
         return;
     }
@@ -565,6 +576,7 @@ sub keypress {
     if ($c eq 'q' && $self->state eq 'playing') {
         $self->action(TAEB::Action::Save->new);
         $self->state('human_override');
+        $self->paused(0);
         return;
     }
 
@@ -572,6 +584,7 @@ sub keypress {
     if ($c eq 'Q' && $self->state eq 'playing') {
         $self->action(TAEB::Action::Quit->new);
         $self->state('human_override');
+        $self->paused(0);
         return;
     }
 
