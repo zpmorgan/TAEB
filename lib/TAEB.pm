@@ -346,26 +346,37 @@ sub handle_playing {
 
     $self->currently('?');
 
+    # In non-kiosk mode, we want AI croaks to be recoverable
+    if (defined TAEB->config && defined TAEB->config->contents &&
+        TAEB->config->contents->{'kiosk_mode'}) {
+        $self->action($self->next_action);
+        $self->run_action;
+        return;
+    }
+
     eval {
-        local $SIG{__DIE__};
+        local $SIG{__DIE__} = sub {
+            my ($message) = @_;
+
+            my $level = $message =~ /^Interrupted\./
+                      ? 'info'
+                      : 'error';
+
+            $self->log->perl($message, level => $level);
+
+            $self->paused(1);
+            $self->redraw;
+
+            $self->complain("Press any key to continue -- $message", 0);
+            $self->get_key;
+
+            die;
+        };
 
         $self->action($self->next_action);
     };
 
-    if ($@) {
-        my $save = $@;
-        die if defined TAEB->config && defined TAEB->config->contents &&
-            TAEB->config->contents->{'kiosk_mode'};
-
-        $self->paused(1);
-        $self->redraw;
-
-        $self->log->perl($save, level => 'error');
-        $self->complain("Press any key to continue -- $save", 0);
-        $self->get_key;
-    } else {
-        $self->run_action;
-    }
+    $self->run_action unless $@;
 }
 
 sub handle_human_override {
