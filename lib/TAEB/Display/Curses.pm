@@ -457,7 +457,7 @@ sub draw_menu {
                    glyph => sub { shift->floor_glyph } },
     item =>      { description => 'Hide monsters',
                    glyph => sub { shift->itemly_glyph },
-                   color => sub { shift->itemly_color } },
+                   color => sub { shift->item_display_color } },
     reset =>     { description => 'Reset to configured settings',
                    immediate => sub {
                        my $self = shift;
