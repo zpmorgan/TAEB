@@ -518,7 +518,7 @@ sub change_itemview {
     $self->itemly_glyph($newglyph);
     $self->itemly_color($newcolor);
 
-    $self->set_interesting(1) if $self->glyph_is_item($newglyph);
+    $self->set_interesting($self->glyph_is_item($newglyph) ? 1 : 0);
 }
 
 sub debug_line {
