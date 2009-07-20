@@ -11,7 +11,7 @@ has level => (
     isa      => 'TAEB::World::Level',
     weak_ref => 1,
     required => 1,
-    handles  => [qw/z known_branch branch glyph_to_type/],
+    handles  => [qw/z known_branch branch glyph_to_type glyph_is_item/],
 );
 
 has type => (
@@ -24,6 +24,18 @@ has glyph => (
     is      => 'rw',
     isa     => 'Str',
     default => ' ',
+);
+
+has itemly_glyph => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => ' ',
+);
+
+has itemly_color => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0,
 );
 
 has floor_glyph => (
@@ -198,6 +210,15 @@ sub _build_intrinsic_cost {
     return int($cost);
 }
 
+# The NetHack display is structured as three layers; when we see a glyph,
+# we can easily ID which layer it belongs to, then we set the higher layers
+# to clear, and don't change what we know about the lower layers.  There's
+# a bit of a special case for the floor, since if we see any item or any
+# non-phasing monster, we know it's not rock; this case is very common, so
+# not rock has a name, 'obscured'.
+#
+# The top layer, monsters, is handled seperately in try_monster.  See
+# Cartographer for the overriding logic.
 sub update {
     my $self        = shift;
     my $newglyph    = shift;
@@ -206,6 +227,9 @@ sub update {
     my $hadfriendly = $self->has_friendly;
 
     # gas spore explosions should not update the map
+    # XXX what's this for?  we don't run the AI until we've seen all
+    # output anyway, and worse things than this will break if we lose
+    # sync
     return if $newglyph =~ m{^[\\/-]$} && $color == 1;
 
     $self->glyph($newglyph);
@@ -237,16 +261,14 @@ sub update {
     # don't want to change what we know about it
     # XXX: if the type is olddoor then we probably kicked/opened the door and
     # something walked onto it. this needs improvement
+    $self->change_itemview($newglyph, $color)
+        unless $self->has_monster ||
+            ($self->x == TAEB->x && $self->y == TAEB->y);
+
     if ($newtype eq 'obscured') {
         # ghosts and xorns and earth elementals should not update the map
         return if $newglyph eq 'X'
                || ($newglyph eq 'E' && $color == COLOR_BROWN);
-
-        $self->set_interesting(1)
-            unless $self->has_monster
-                || $self->has_boulder
-                || $hadfriendly; # if a friendly stepped off it, we don't
-                                 # want it marked as interesting.
 
         return unless $oldtype eq 'rock'
                    || $oldtype eq 'unexplored'
@@ -487,6 +509,18 @@ sub change_type {
     $self->rebless("TAEB::World::Tile::\L\u$newtype", @_);
 }
 
+sub change_itemview {
+    my ($self, $newglyph, $newcolor) = @_;
+
+    return if $self->itemly_glyph eq $newglyph &&
+        $self->itemly_color == $newcolor;
+
+    $self->itemly_glyph($newglyph);
+    $self->itemly_color($newcolor);
+
+    $self->set_interesting(1) if $self->glyph_is_item($newglyph);
+}
+
 sub debug_line {
     my $self = shift;
     my @bits;
@@ -496,8 +530,10 @@ sub debug_line {
     push @bits, 't=' . $self->type;
 
     push @bits, 'g<' . $self->glyph . '>';
+    push @bits, 'i<' . $self->itemly_glyph . '>'
+        if $self->glyph ne $self->itemly_glyph;
     push @bits, 'f<' . $self->floor_glyph . '>'
-        if $self->glyph ne $self->floor_glyph;
+        if $self->itemly_glyph ne $self->floor_glyph;
 
     push @bits, sprintf 'i=%d%s',
                     $self->item_count,
@@ -588,6 +624,8 @@ sub normal_color {
     $color = COLOR_WHITE if $color == COLOR_NONE;
     return display($color);
 }
+
+sub item_display_color { display(shift->itemly_color) }
 
 sub debug_color {
     my $self = shift;
