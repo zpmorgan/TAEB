@@ -60,32 +60,58 @@ sub castable {
 sub failure_rate {
     my $self = shift;
     my %penalties = (
-        # role base emergency shield suit int/wis
-        Arc => [ 5,   0,  2,  10, 'int' ],
-        Bar => [ 14,  0,  0,  8,  'int' ],
-        Cav => [ 12,  0,  1,  8,  'int' ],
-        Hea => [ 3,  -3,  2,  10, 'wis' ],
-        Kni => [ 8,  -2,  0,  9,  'wis' ],
-        Mon => [ 8,  -2,  2,  20, 'wis' ],
-        Pri => [ 3,  -3,  2,  10, 'wis' ],
-        Ran => [ 9,   2,  1,  10, 'int' ],
-        Rog => [ 8,   0,  1,  9,  'int' ],
-        Sam => [ 10,  0,  0,  8,  'int' ],
-        Tou => [ 5,   1,  2,  10, 'int' ],
-        Val => [ 10, -2,  0,  9,  'wis' ],
-        Wiz => [ 1,   0,  3,  10, 'int' ],
+        Arc => {
+            base => 5,  emergency =>  0, shield => 2, suit => 10, stat => 'int'
+        },
+        Bar => {
+            base => 14, emergency =>  0, shield => 0, suit => 8,  stat => 'int'
+        },
+        Cav => {
+            base => 12, emergency =>  0, shield => 1, suit => 8,  stat => 'int'
+        },
+        Hea => {
+            base => 3,  emergency => -3, shield => 2, suit => 10, stat => 'wis'
+        },
+        Kni => {
+            base => 8,  emergency => -2, shield => 0, suit => 9,  stat => 'wis'
+        },
+        Mon => {
+            base => 8,  emergency => -2, shield => 2, suit => 20, stat => 'wis'
+        },
+        Pri => {
+            base => 3,  emergency => -3, shield => 2, suit => 10, stat => 'wis'
+        },
+        Ran => {
+            base => 9,  emergency =>  2, shield => 1, suit => 10, stat => 'int'
+        },
+        Rog => {
+            base => 8,  emergency =>  0, shield => 1, suit => 9,  stat => 'int'
+        },
+        Sam => {
+            base => 10, emergency =>  0, shield => 0, suit => 8,  stat => 'int'
+        },
+        Tou => {
+            base => 5,  emergency =>  1, shield => 2, suit => 10, stat => 'int'
+        },
+        Val => {
+            base => 10, emergency => -2, shield => 0, suit => 9,  stat => 'wis'
+        },
+        Wiz => {
+            base => 1,  emergency =>  0, shield => 3, suit => 10, stat => 'int'
+        },
     );
 
-    my $penalty = $penalties{TAEB->role}->[0];
+    # start with base penalty
+    my $penalty = $penalties{TAEB->role}->{base};
 
     # this is where inventory penalty calculation would go
 
-    $penalty += $penalties{TAEB->role}->[1] if $self->emergency;
+    $penalty += $penalties{TAEB->role}->{emergency} if $self->emergency;
     $penalty -= 4 if $self->role eq TAEB->role;
 
     my $chance;
     my $SKILL = 0; # XXX: this needs to reference skill levels
-    my $basechance = int(TAEB->($penalties{TAEB->role}->[4]) * 11 / 2);
+    my $basechance = int(TAEB->($penalties{TAEB->role}->{stat}) * 11 / 2);
     my $diff = (($self->level - 1) * 4 - ($SKILL * 6 + int(TAEB->xl / 3) + 1));
     if ($diff > 0) {
         $chance = $basechance - int(sqrt(900 * $diff + 2000));
