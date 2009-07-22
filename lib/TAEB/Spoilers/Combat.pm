@@ -44,13 +44,29 @@ sub _nonweapon_damage {
 # speciest weapons are discounted (but brands are full)
 # Vorpal and Tsurugi are overestimated
 my %artifact_bonus = (
-    Excalibur => 5.5, Stormbringer => 6, Mjollnir => 12.5, Cleaver => 3.5,
-    Grimtooth => 3.5, Sting => 1, Orcrist => 1, Magicbane => 5,
-    'Frost Brand' => 'DOUBLE', 'Fire Brand' => 'DOUBLE', Dragonbane => 1,
-    Demonbane => 1, Werebane => 1, Grayswandir => 'DOUBLE', Giantslayer => 1,
-    Ogresmasher => 1, Trollsbane => 1, 'Vorpal Blade' => 5, Snickersnee => 4.5,
-    Sunsword => 1, 'The Sceptre of Might' => 'DOUBLE',
-    'The Staff of Aesculapius' => 'DOUBLE', 'The Tsurugi of Muramasa' => 10,
+    'Excalibur'                => 5.5,
+    'Stormbringer'             => 6,
+    'Mjollnir'                 => 12.5,
+    'Cleaver'                  => 3.5,
+    'Grimtooth'                => 3.5,
+    'Sting'                    => 1,
+    'Orcrist'                  => 1,
+    'Magicbane'                => 5,
+    'Frost Brand'              => 'DOUBLE',
+    'Fire Brand'               => 'DOUBLE',
+    'Dragonbane'               => 1,
+    'Demonbane'                => 1,
+    'Werebane'                 => 1,
+    'Grayswandir'              => 'DOUBLE',
+    'Giantslayer'              => 1,
+    'Ogresmasher'              => 1,
+    'Trollsbane'               => 1,
+    'Vorpal Blade'             => 5,
+    'Snickersnee'              => 4.5,
+    'Sunsword'                 => 1,
+    'The Sceptre of Might'     => 'DOUBLE',
+    'The Staff of Aesculapius' => 'DOUBLE',
+    'The Tsurugi of Muramasa'  => 10,
 );
 
 sub _artifact_damage {
