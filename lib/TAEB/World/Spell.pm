@@ -115,9 +115,9 @@ sub failure_rate {
                       if TAEB->equipment->bodyarmor->is_metallic;
         # if wearing a robe, either halve the suit penalty or negate completely 
         if (defined TAEB->equipment->cloak
-            && TAEB->equipment->cloak->name eq 'robe') {
+           && TAEB->equipment->cloak->name eq 'robe') {
             if ($suit_penalty > 0) {
-                $suit_penalty /= 2;
+                $suit_penalty = int($suit_penalty / 2);
             }
             else {
                 $suit_penalty = -($penalties{TAEB->role}->{suit});
