@@ -1,1 +1,1 @@
-au! BufRead,BufNewFile *{taeb,TAEB}/log{s,}/*.log* set filetype=taeb-log
+au! BufRead,BufNewFile */.taeb*/log{s,}/*.log* set filetype=taeb-log
