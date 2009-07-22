@@ -40,12 +40,33 @@ sub _nonweapon_damage {
     return 0;
 }
 
+# This isn't fully accurate, but it's better than the old approximation;
+# speciest weapons are discounted (but brands are full)
+# Vorpal and Tsurugi are overestimated
+my %artifact_bonus = (
+    Excalibur => 5.5, Stormbringer => 6, Mjollnir => 12.5, Cleaver => 3.5,
+    Grimtooth => 3.5, Sting => 1, Orcrist => 1, Magicbane => 5,
+    'Frost Brand' => 'DOUBLE', 'Fire Brand' => 'DOUBLE', Dragonbane => 1,
+    Demonbane => 1, Werebane => 1, Grayswandir => 'DOUBLE', Giantslayer => 1,
+    Ogresmasher => 1, Trollsbane => 1, 'Vorpal Blade' => 5, Snickersnee => 4.5,
+    Sunsword => 1, 'The Sceptre of Might' => 'DOUBLE',
+    'The Staff of Aesculapius' => 'DOUBLE', 'The Tsurugi of Muramasa' => 10,
+);
+
 sub _artifact_damage {
     my $self = shift;
     my $weapon = shift;
 
     # XXX: fix this later
-    return $self->_weapon_damage($weapon);
+    my $dam = $self->_weapon_damage($weapon);
+
+    if ($artifact_bonus{$weapon->artifact} eq 'DOUBLE') {
+        $dam *= 2;
+    } else {
+        $dam += $artifact_bonus{$weapon->artifact};
+    }
+
+    return $dam;
 }
 
 sub _weapon_damage {
