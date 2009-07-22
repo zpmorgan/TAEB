@@ -104,7 +104,37 @@ sub failure_rate {
     # start with base penalty
     my $penalty = $penalties{TAEB->role}->{base};
 
-    # this is where inventory penalty calculation would go
+    # Inventory penalty calculation
+    # first the shield!
+    $penalty += $penalties{TAEB->role}->{shield}
+             if defined TAEB->equipment->shield;
+    # body armor, complicated with the robe
+    if (defined TAEB->equipment->bodyarmor) {
+        my $suit_penalty = 0;
+        $suit_penalty = $penalties{TAEB->role}->{suit}
+                      if TAEB->equipment->bodyarmor->is_metallic;
+        # if wearing a robe, either halve the suit penalty or negate completely 
+        if (defined TAEB->equipment->cloak
+            && TAEB->equipment->cloak->name eq 'robe') {
+            if ($suit_penalty > 0) {
+                $suit_penalty /= 2;
+            }
+            else {
+                $suit_penalty = -($penalties{TAEB->role}->{suit});
+            }
+        }
+        $penalty += $suit_penalty;
+    }
+    # metallic helmet, except if HoB
+    $penalty += 4 if defined TAEB->equipment->helmet
+                  && TAEB->equipment->helmet->is_metallic
+                  && TAEB->equipment->helmet->name ne 'helm of brilliance';
+    # metallic gloves
+    $penalty += 6 if defined TAEB->equipment->gloves
+                  && TAEB->equipment->gloves->is_metallic;
+    # metallic boots
+    $penalty += 2 if defined TAEB->equipment->boots
+                  && TAEB->equipment->boots->is_metallic;
 
     $penalty += $penalties{TAEB->role}->{emergency} if $self->emergency;
     $penalty -= 4 if $self->role eq TAEB->role;
