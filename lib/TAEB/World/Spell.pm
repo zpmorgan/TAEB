@@ -101,6 +101,8 @@ sub failure_rate {
         },
     );
 
+    use integer;
+
     # start with base penalty
     my $penalty = $penalties{TAEB->role}->{base};
 
@@ -117,7 +119,7 @@ sub failure_rate {
         if (defined TAEB->equipment->cloak
            && TAEB->equipment->cloak->name eq 'robe') {
             if ($suit_penalty > 0) {
-                $suit_penalty = int($suit_penalty / 2);
+                $suit_penalty /= 2;
             }
             else {
                 $suit_penalty = -($penalties{TAEB->role}->{suit});
@@ -141,13 +143,13 @@ sub failure_rate {
 
     my $chance;
     my $SKILL = 0; # XXX: this needs to reference skill levels
-    my $basechance = int(TAEB->($penalties{TAEB->role}->{stat}) * 11 / 2);
-    my $diff = (($self->level - 1) * 4 - ($SKILL * 6 + int(TAEB->xl / 3) + 1));
+    my $basechance = TAEB->($penalties{TAEB->role}->{stat}) * 11 / 2;
+    my $diff = (($self->level - 1) * 4 - ($SKILL * 6 + (TAEB->xl / 3) + 1));
     if ($diff > 0) {
-        $chance = $basechance - int(sqrt(900 * $diff + 2000));
+        $chance = $basechance - sqrt(900 * $diff + 2000);
     }
     else {
-        my $learning = int(((-15) * $diff) / $SKILL);
+        my $learning = -15 * $diff / $SKILL;
         $chance = $basechance + min($learning, 20);
     }
 
@@ -158,15 +160,15 @@ sub failure_rate {
        && TAEB->equipment->shield->name ne 'small shield') {
         if ($self->role eq TAEB->role) {
             # halve chance if special spell
-            $chance = int($chance / 2);
+            $chance /= 2;
         }
         else {
             # otherwise quarter chance
-            $chance = int($chance / 4);
+            $chance /= 4;
         }
     }
 
-    $chance = int($chance * (20 - $penalty) / 15) - $penalty;
+    $chance = $chance * (20 - $penalty) / 15 - $penalty;
     $chance = max(min($chance, 100), 0);
 
     return $chance;
