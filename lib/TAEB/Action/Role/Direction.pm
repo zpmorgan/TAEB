@@ -32,7 +32,7 @@ before run => sub {
 
     return unless $dx || $dy;
 
-    while(1) {
+    while (1) {
         $x += $dx;
         $y += $dy;
 
