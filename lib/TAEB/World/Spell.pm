@@ -154,6 +154,17 @@ sub failure_rate {
     $chance = max(min($chance, 120), 0);
 
     # shield and special spell
+    if (defined TAEB->equipment->shield
+       && TAEB->equipment->shield->name ne 'small shield') {
+        if ($self->role eq TAEB->role) {
+            # halve chance if special spell
+            $chance = int($chance / 2);
+        }
+        else {
+            # otherwise quarter chance
+            $chance = int($chance / 4);
+        }
+    }
 
     $chance = int($chance * (20 - $penalty) / 15) - $penalty;
     $chance = max(min($chance, 100), 0);
