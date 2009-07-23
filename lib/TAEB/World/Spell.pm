@@ -139,17 +139,18 @@ sub failure_rate {
                   && TAEB->equipment->boots->is_metallic;
 
     $penalty += $penalties{TAEB->role}->{emergency} if $self->emergency;
-    $penalty -= 4 if $self->role eq TAEB->role;
+    $penalty -= 4 if ($self->role || '') eq TAEB->role;
 
     my $chance;
     my $SKILL = 0; # XXX: this needs to reference skill levels
-    my $basechance = TAEB->($penalties{TAEB->role}->{stat}) * 11 / 2;
-    my $diff = (($self->level - 1) * 4 - ($SKILL * 6 + (TAEB->xl / 3) + 1));
+    my $statname = $penalties{TAEB->role}->{stat};
+    my $basechance = TAEB->$statname * 11 / 2;
+    my $diff = (($self->level - 1) * 4 - ($SKILL * 6 + (TAEB->level / 3) + 1));
     if ($diff > 0) {
         $chance = $basechance - sqrt(900 * $diff + 2000);
     }
     else {
-        my $learning = -15 * $diff / $SKILL;
+        my $learning = -15 * $diff / $self->level;
         $chance = $basechance + min($learning, 20);
     }
 
@@ -170,6 +171,11 @@ sub failure_rate {
 
     $chance = $chance * (20 - $penalty) / 15 - $penalty;
     $chance = max(min($chance, 100), 0);
+
+    # The internal NetHack code returns success, but we (to be more
+    # understandable to players) want to return failure.
+
+    $chance = 100 - $chance;
 
     return $chance;
 }
