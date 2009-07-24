@@ -25,6 +25,16 @@ sub msg_slot_empty {
     $self->$clear;
 }
 
+subscribe now_wielding => sub {
+    my ($self, $event) = @_;
+    my $item = $event->item;
+
+    $self->weapon($item);
+    $item->cursed(1) if $event->welded;
+    $item->wielded(1);
+    TAEB->inventory->add($item->slot => $item);
+};
+
 __PACKAGE__->meta->make_immutable;
 
 1;
