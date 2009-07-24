@@ -110,6 +110,7 @@ my %normal_commands = (
         }
         return 0;
     },
+    'd' => sub { TAEB->display->change_draw_mode; 1; },
 );
 
 sub activate {
