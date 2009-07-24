@@ -1,6 +1,6 @@
 package TAEB::Debug::Map;
 use TAEB::OO;
-use TAEB::Util qw/item_menu/;
+use TAEB::Util qw/item_menu vi2delta/;
 
 subscribe keypress => sub {
     my $self  = shift;
@@ -8,119 +8,140 @@ subscribe keypress => sub {
     $self->activate if $event->key eq ';';
 };
 
-sub activate {
+for my $name (qw/x y z z_index/) {
+    has $name => (
+        metaclass => 'Counter',
+        isa       => 'Int',
+        is        => 'rw',
+        provides  => { inc => "d$name" },
+    );
+}
+
+has topline => (
+    isa => 'Str',
+    is  => 'rw',
+);
+
+sub levels_here {
     my $self = shift;
+    return grep { $_->turns_spent_on != 0 }
+        TAEB->dungeon->get_levels(shift || $self->z);
+}
 
-    my ($x, $y) = (TAEB->x, TAEB->y);
-    my $level = TAEB->current_level;
-    my $z_index = 0;
+sub z_with_branch {
+    my $self = shift;
+    my $z = shift;
+    my $align = shift || TAEB->current_level;
 
-    TAEB->redraw(botl => "Displaying $level");
+    my @here = $self->levels_here($z);
 
-    COMMAND: while (1) {
-        my $tile = $level->at($x, $y);
-
-        # draw some info about the tile at the top
-        TAEB->display_topline($tile->debug_line);
-        TAEB->place_cursor($x, $y);
-
-        # where to next?
-        my $c = TAEB->get_key;
-
-           if ($c eq 'h') { --$x }
-        elsif ($c eq 'j') { ++$y }
-        elsif ($c eq 'k') { --$y }
-        elsif ($c eq 'l') { ++$x }
-        elsif ($c eq 'y') { --$x; --$y }
-        elsif ($c eq 'u') { ++$x; --$y }
-        elsif ($c eq 'b') { --$x; ++$y }
-        elsif ($c eq 'n') { ++$x; ++$y }
-        elsif ($c eq 'H') { $x -= 8 }
-        elsif ($c eq 'J') { $y += 8 }
-        elsif ($c eq 'K') { $y -= 8 }
-        elsif ($c eq 'L') { $x += 8 }
-        elsif ($c eq 'Y') { $x -= 8; $y -= 8 }
-        elsif ($c eq 'U') { $x += 8; $y -= 8 }
-        elsif ($c eq 'B') { $x -= 8; $y += 8 }
-        elsif ($c eq 'N') { $x += 8; $y += 8 }
-        elsif ($c eq ';' || $c eq '.' || $c eq "\e"
-            || $c eq "\n" || $c eq ' ' || $c eq 'q' || $c eq 'Q') {
-            last;
-        }
-        elsif ($c eq '<' || $c eq '>') {
-            my $dz = $c eq '<' ? -1 : 1;
-
-            # if we don't filter out these levels, then levels consisting of
-            # just rock will make it through, because we initialize those
-            # (apparently!)
-            my @levels = grep { $_->turns_spent_on > 0 }
-                         TAEB->dungeon->get_levels($level->z + $dz);
-            next COMMAND if @levels == 0;
-
-            $level = sub {
-                # only one level, easy choice
-                if (@levels == 1) {
-                    return $levels[0];
-                }
-
-                # try to stay in the same branch
-                for (@levels) {
-                    return $_ if $_->branch eq $level->branch;
-                }
-
-                # or go to a level with an unknown branch
-                for (@levels) {
-                    return $_ if !$_->known_branch;
-                }
-
-                # finally, pick a level arbitrarily
-                return $levels[0];
-            }->();
-
-            $z_index = 0;
-
-            TAEB->redraw(level => $level, botl => "Displaying $level");
-
-            if (@levels > 1) {
-                TAEB->display_topline("Note: there are " . @levels . " levels at this depth. Use v to see the next.");
-            }
-        }
-        elsif ($c eq 'v') {
-            my @levels = grep { $_->turns_spent_on > 0 }
-                         TAEB->dungeon->get_levels($level->z);
-            next COMMAND if @levels < 2;
-
-            $level = $levels[++$z_index % @levels];
-            TAEB->redraw(level => $level, botl => "Displaying $level");
-        }
-        elsif ($c eq 'i') {
-            my @items = $level->at($x, $y)->items;
-            my $description = "The items on $tile";
-
-            if (@items == 0) {
-                $description = "The items on $level";
-                @items = $level->items;
-            }
-
-            item_menu($description, \@items);
-        }
-        elsif ($c eq 't') {
-            item_menu("Tile data for ($x, $y)", $tile);
-        }
-        elsif ($c eq 'T') {
-            item_menu("Level data for $z_index", $level);
-        }
-        elsif ($c eq 'm') {
-            if (my $monster = $tile->monster) {
-                item_menu("Monster data for $monster", $monster);
-            }
-        }
-
-        $x %= 80;
-        $y = ($y-1)%21+1;
+    if (! @here) {
+        $self->topline("No levels at that depth.");
+        return;
     }
 
-    # back to normal
+    $self->z($z);
+    $self->z_index(0);
+
+    for my $z_index (0 .. $#here) {
+        if ($here[$z_index] == $align ||
+                ($here[$z_index]->branch || '') eq ($align->branch || '')) {
+            $self->z_index($z_index);
+            last;
+        }
+    }
+
+    if (@here > 1) {
+        $self->topline("Note: there are " . @here . " levels at this depth. Use v to see the next.");
+    }
+
+    1;
+}
+
+sub level {
+    my $self = shift;
+    my @here = $self->levels_here;
+
+    return $here[$self->z_index % @here];
+}
+
+sub tile {
+    my $self = shift;
+
+    return $self->level->at($self->x, $self->y);
+}
+
+# Commands should return true if they need to force a redraw, or 'LAST'
+# if they are a terminator.
+
+my %normal_commands = (
+    (map { my ($dx, $dy) = vi2delta $_;
+           $_    => sub { my $self = shift;
+                          $self->dx($dx); $self->dy($dy); 0; },
+           uc $_ => sub { my $self = shift;
+                          $self->dx(8*$dx); $self->dy(8*$dy); 0; } }
+         qw/h j k l y u b n/),
+
+    (map { $_ => sub { 'LAST' } } "\e", "\n", ";", ".", " ", "q", "Q"),
+
+    '<' => sub { my $self = shift; $self->z_with_branch($self->z - 1); 1 },
+    '>' => sub { my $self = shift; $self->z_with_branch($self->z + 1); 1 },
+    'v' => sub { shift->dz_index(+1); 1 },
+    'i' => sub {
+        my $tile = shift->tile;
+        my @items = $tile->items;
+        item_menu (@items ? ("The items on $tile", \@items)
+                : ("The items on " . $tile->level, [ $tile->level->items ]));
+        1;
+    },
+    't' => sub {
+        my $t = shift->tile;
+        item_menu("Tile data for (" . $t->x . "," . $t->y . ")", $t);
+        1;
+    },
+    'T' => sub {
+        my $level = shift->level;
+        item_menu("Level data for " . $level, $level);
+        1;
+    },
+    'm' => sub {
+        if (my $monster = shift->tile->monster) {
+            item_menu("Monster data for $monster", $monster); return 1;
+        }
+        return 0;
+    },
+);
+
+sub activate {
+    my $self = shift;
+    my $redraw = 1;
+    my %commands = (%normal_commands, TAEB->ai->map_commands);
+
+    $self->x(TAEB->x);
+    $self->y(TAEB->y);
+
+    $self->z_with_branch(TAEB->z, TAEB->current_level);
+
+    COMMAND: while (1) {
+        TAEB->display_topline($self->topline);
+        $self->topline($self->tile->debug_line);
+
+        TAEB->redraw(level => $self->level,
+            botl => "Displaying " . $self->level) if $redraw;
+        $redraw = 0;
+
+        TAEB->place_cursor($self->x, $self->y);
+
+        my $c  = TAEB->get_key;
+        my $rv = $commands{$c}->($self);
+
+        last if ($rv eq 'LAST');
+        $redraw = 1 if $rv;
+
+        $self->x($self->x % 80);
+        $self->y(($self->y-1)%21+1);
+    }
+
     TAEB->redraw;
 }
 
