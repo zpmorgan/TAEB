@@ -576,6 +576,15 @@ our @msg_regex = (
         qr/crashes on .* and breaks into shards/ =>
             ['check' => 'discoveries'],
     ],
+    [
+        # Avoid 'stolen', which comes up in many more places
+        # 'stole' comes up in quest dialog too sometimes, but checking
+        # our inventory in response to that is not a disaster
+        # This could be us stealing (unpaid becoming 'paid'), or a
+        # monster stealing (missing items).
+        qr/\bstole\b/ =>
+            ['check' => 'inventory'],
+    ],
     [   # Avoid matching shopkeeper name by checking for capital lettering.
         qr/Welcome(?: again)? to(?> [A-Z]\S+)+ ([a-z -]+)!/ =>
             ['enter_room',
