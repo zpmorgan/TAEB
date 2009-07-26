@@ -18,7 +18,7 @@ for my $name (qw/x y z z_index/) {
 }
 
 has topline => (
-    isa => 'Str',
+    isa => 'Maybe[Str]',
     is  => 'rw',
 );
 
@@ -125,22 +125,28 @@ sub activate {
 
     COMMAND: while (1) {
         TAEB->display_topline($self->topline);
-        $self->topline($self->tile->debug_line);
 
         TAEB->redraw(level => $self->level,
             botl => "Displaying " . $self->level) if $redraw;
-        $redraw = 0;
 
         TAEB->place_cursor($self->x, $self->y);
 
         my $c  = TAEB->get_key;
-        my $rv = $commands{$c}->($self);
+        $self->topline(undef);
 
-        last if ($rv eq 'LAST');
-        $redraw = 1 if $rv;
+        if ($commands{$c}) {
+            $redraw = $commands{$c}->($self);
+            last if $redraw eq 'LAST';
+        } else {
+            $self->topline("Unknown command '$c'");
+            $redraw = 0;
+        }
 
         $self->x($self->x % 80);
         $self->y(($self->y-1)%21+1);
+
+        $self->topline($self->tile->debug_line)
+            unless defined $self->topline;
     }
 
     TAEB->redraw;
