@@ -1,7 +1,7 @@
 package TAEB::Display::Curses;
 use TAEB::OO;
 use Curses ();
-use TAEB::Util qw/:colors max/;
+use TAEB::Util qw/:colors max tile_type_to_glyph tile_type_to_color display/;
 use Time::HiRes 'gettimeofday';
 
 extends 'TAEB::Display';
@@ -455,6 +455,9 @@ sub draw_menu {
                    color => sub { shift->los_color } },
     floor =>     { description => 'Hide objects and monsters',
                    glyph => sub { shift->floor_glyph } },
+    terrain =>   { description => 'Display terrain knowledge',
+                   glyph => sub { tile_type_to_glyph(shift->type) },
+                   color => sub { display(tile_type_to_color(shift->type)) } },
     item =>      { description => 'Hide monsters',
                    glyph => sub { shift->itemly_glyph },
                    color => sub { shift->item_display_color } },
