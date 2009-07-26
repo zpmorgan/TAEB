@@ -78,6 +78,12 @@ has explored => (
     default  => 0,
 );
 
+has nondiggable => (
+    is       => 'rw',
+    isa      => 'Bool',
+    default  => 0,
+);
+
 has engraving => (
     is      => 'rw',
     isa     => 'Str',
