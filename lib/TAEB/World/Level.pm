@@ -129,7 +129,7 @@ has _astar_cache => (
 #    undef => maybe that level?
 #
 
-our @special_levels = qw/minetown rogue oracle bigroom/;
+our @special_levels = qw/minetown rogue oracle bigroom minend/;
 
 for my $level (@special_levels) {
     has "is_$level" => (
