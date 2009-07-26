@@ -29,9 +29,10 @@ subscribe now_wielding => sub {
     my ($self, $event) = @_;
     my $item = $event->item;
 
+    $self->weapon->is_wielded(0) if $self->weapon;
     $self->weapon($item);
     $item->cursed(1) if $event->welded;
-    $item->wielded(1);
+    $item->is_wielded(1);
     TAEB->inventory->add($item->slot => $item);
 };
 
