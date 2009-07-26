@@ -24,8 +24,9 @@ has topline => (
 
 sub levels_here {
     my $self = shift;
-    return grep { $_->turns_spent_on != 0 }
-        TAEB->dungeon->get_levels(shift || $self->z);
+    my $z = shift;
+    $z = $self->z unless defined $z;
+    return grep { $_->turns_spent_on != 0 } TAEB->dungeon->get_levels($z);
 }
 
 sub z_with_branch {
