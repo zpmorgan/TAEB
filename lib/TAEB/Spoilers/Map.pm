@@ -3,8 +3,6 @@ package TAEB::Spoilers::Map;
 use strict;
 use warnings;
 
-use NetHack::FixedMap;
-
 my %terrain2taeb = (
     # TAEB doesn't care about the stair/ladder distinction; an exit is an exit
     (map { $_ => $_ } qw/floor stairsup stairsdown fountain bars ice lava
