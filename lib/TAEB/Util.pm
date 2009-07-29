@@ -35,10 +35,10 @@ use constant \%colors;
 
 use Sub::Exporter -setup => {
     exports => [
-        qw(tile_types tile_type_to_glyph trap_types delta2vi vi2delta deltas),
-        qw(dice colors crow_flies angle align2str display assert assert_is),
-        qw(item_menu hashref_menu object_menu list_menu numeric_color),
-        qw(string_color),
+        qw(tile_types tile_type_to_glyph tile_type_to_color trap_types),
+        qw(delta2vi vi2delta deltas dice colors crow_flies angle align2str),
+        qw(display assert assert_is item_menu hashref_menu object_menu),
+        qw(list_menu numeric_color string_color),
         keys %colors,
         qw(blessed isweak refaddr weaken),
         @List::Util::EXPORT_OK,
@@ -129,7 +129,7 @@ sub tile_types {
 }
 
 do {
-    my %type_to_glyph;
+    my (%type_to_glyph, %type_to_color);
     for my $glyph (keys %glyphs) {
         my $type  = $glyphs{$glyph};
         my @types = @{ ref($type) eq 'ARRAY' ? $type : [$type] };
@@ -137,9 +137,24 @@ do {
         $type_to_glyph{$_} = $glyph for @types;
     }
 
+    for my $color (keys %feature_colors) {
+        my $type  = $feature_colors{$color};
+        my @types = @{ ref($type) eq 'ARRAY' ? $type : [$type] };
+
+        $type_to_color{$_} = $color for @types;
+    }
+
+    $type_to_glyph{'obscured'} = '?';
+    $type_to_color{'obscured'} = COLOR_ORANGE;
+
     sub tile_type_to_glyph {
         my $type = shift;
         return $type_to_glyph{$type} || confess "Unknown tile type '$type'";
+    }
+
+    sub tile_type_to_color {
+        my $type = shift;
+        return $type_to_color{$type} || confess "Unknown tile type '$type'";
     }
 };
 

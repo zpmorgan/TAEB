@@ -129,7 +129,7 @@ has _astar_cache => (
 #    undef => maybe that level?
 #
 
-our @special_levels = qw/minetown rogue oracle bigroom/;
+our @special_levels = qw/minetown rogue oracle bigroom minend/;
 
 for my $level (@special_levels) {
     has "is_$level" => (
@@ -446,6 +446,7 @@ sub matches_vt {
                  && $tile->type ne 'rock'
                  && $tile->type ne 'unexplored'
                  && $tile->type ne 'obscured'
+                 && $tile->glyph ne ' '
                  && $tile->type ne 'floor';
 
         return 1;

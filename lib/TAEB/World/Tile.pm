@@ -78,6 +78,12 @@ has explored => (
     default  => 0,
 );
 
+has nondiggable => (
+    is       => 'rw',
+    isa      => 'Bool',
+    default  => 0,
+);
+
 has engraving => (
     is      => 'rw',
     isa     => 'Str',
@@ -278,6 +284,10 @@ sub update {
         # If the tile is not obscured, there are no items on it.
         $self->clear_items;
     }
+
+    # If floor_glyph is space but the type is not rock, we've had information
+    # implanted into us by T:S:Map.  Don't break that.
+    return if ($self->floor_glyph eq ' ' && $newtype eq 'unexplored');
 
     $self->change_type($newtype => $newglyph);
 }
