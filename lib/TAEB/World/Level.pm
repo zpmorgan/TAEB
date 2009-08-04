@@ -106,6 +106,22 @@ has fully_explored => (
     default => 0,
 );
 
+# Some information about the history of a Sokoban level needs to be
+# retained in order to be able to solve it correctly. There's no
+# reason we can't count the number of eliminated pit/hole traps on
+# other levels too (could come in useful on the VoTD, for instance).
+has pit_and_hole_traps_untrapped => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
+
+subscribe covered_pit => sub {
+    my $self = shift;
+    $self->pit_and_hole_traps_untrapped(
+        $self->pit_and_hole_traps_untrapped + 1);
+};
+
 # Note that the quest portal can be on the rogue level, so this can't
 # be just another special level.
 has has_quest_portal => (

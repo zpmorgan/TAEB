@@ -280,6 +280,7 @@ has level_maps => (
             my %locations;
             my $x = 0;
             my $y = -1; # there's an initial newline
+            my $pitcount = 0;
 
             while (length($map_text)) {
                 # Remove first character destructively
@@ -294,6 +295,7 @@ has level_maps => (
                 $map[$y][$x] = $char;
                 $locations{$char} = [$x, $y];
                 $x++;
+                $pitcount++ if $char =~ /[0-9!\"\:\$\%\&\'\~]/;
             }
             # There's a blank line at the bottom of the text maps for
             # formatting reasons.
@@ -301,6 +303,7 @@ has level_maps => (
 
             $level->{'map'} = \@map;
             $level->{'locations'} = \%locations;
+            $level->{'pitcount'} = $pitcount;
 
             # Likewise for the solution.
             $level->{'solution'} = [map {
@@ -370,12 +373,9 @@ sub recognise_sokoban_variant {
 sub remaining_pits {
     my $self = shift;
     my $level = shift || TAEB->current_level;
-    my $remaining_pits = 0;
-    $level->each_tile(sub {
-        my $t = shift;
-        $remaining_pits++ if $t->type eq 'trap';
-    });
-    return $remaining_pits;
+    my $variant = shift || scalar $self->recognise_sokoban_variant($level);
+    return $self->level_maps->{$variant}->{'pitcount'} -
+           $level->pit_and_hole_traps_untrapped;
 }
 
 sub first_unsolved_sokoban_level {
@@ -427,7 +427,7 @@ sub next_sokoban_step {
     my $solution = $self->level_maps->{$variant}->{'solution'};
 
     # Find out how many pits have been filled already.
-    my $remaining_pits = $self->remaining_pits($level);
+    my $remaining_pits = $self->remaining_pits($level, $variant);
 
     return if $remaining_pits == 0; # already solved
 
@@ -604,10 +604,13 @@ Returns the lowest level in Sokoban that can be solved from here
 (i.e. is not yet completely solved and has not been fatally messed up)
 but that TAEB has encountered in the past.
 
-=head2 remaining_pits [Level] -> Int
+=head2 remaining_pits [Level] [Str] -> Int
 
 Returns the number of pits/holes remaining on level Level (defaulting
-to the current level). When this is 0, the level is solved.
+to the current level). When this is 0, the level is solved. The second
+argument is a string giving the variant, which can be added to avoid
+recalculating the variant if it's already known; if omitted, the
+variant will be calculated by looking ath the level map.
 
 =head2 next_sokoban_step Level [Pathable] -> Maybe Tile
 
