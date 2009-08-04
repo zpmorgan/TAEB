@@ -112,7 +112,7 @@ has fully_explored => (
 # other levels too (could come in useful on the VoTD, for instance).
 has pit_and_hole_traps_untrapped => (
     is      => 'rw',
-    isa     => 'Bool',
+    isa     => 'Int',
     default => 0,
 );
 
