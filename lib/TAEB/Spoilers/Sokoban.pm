@@ -399,6 +399,15 @@ sub first_solvable_sokoban_level {
     });
 }
 
+sub probably_has_genuine_boulder {
+    my $self = shift;
+    my $tile = shift;
+    return 0 unless $tile->has_boulder;
+    return 1 if $tile->type eq 'obscured';
+    return 1 if $tile->known_genuine_boulder;
+    return 0; # probably a mimic
+}
+
 sub next_sokoban_step {
     my $self = shift;
     my $level = shift;
@@ -463,7 +472,7 @@ sub next_sokoban_step {
 
     $level->each_tile(sub {
         my $t = shift;
-        if ($t->has_boulder) {
+        if ($self->probably_has_genuine_boulder($t)) {
             my $y = $t->y - $top;
             my $x = $t->x - $left;
             my $char = $map->[$y]->[$x];
@@ -611,6 +620,15 @@ to the current level). When this is 0, the level is solved. The second
 argument is a string giving the variant, which can be added to avoid
 recalculating the variant if it's already known; if omitted, the
 variant will be calculated by looking ath the level map.
+
+=head2 probably_has_genuine_boulder Tile -> Bool
+
+Returns true if the tile appears to have a boulder on, and it probably
+is a genuine boulder, rather than a mimic pretending. To be precise,
+this returns true if we've pushed a boulder onto the square and
+haven't pushed it off again, or if the tile is obscured and appears to
+have a boulder; this handles all cases but that of a mimic visible
+when we arrive on the level, and a search should detect that.
 
 =head2 next_sokoban_step Level [Pathable] -> Maybe Tile
 

@@ -84,6 +84,14 @@ has nondiggable => (
     default  => 0,
 );
 
+# Is there an object on this square that's known to be a boulder,
+# rather than a mimic just pretending?
+has known_genuine_boulder => (
+    is       => 'rw',
+    isa      => 'Bool',
+    default  => 0,
+);
+
 has engraving => (
     is      => 'rw',
     isa     => 'Str',

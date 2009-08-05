@@ -10,14 +10,14 @@ has path => (
     provided => 1,
 );
 
-has [qw/hit_obscured_monster hit_immobile_boulder/] => (
+has [qw/hit_obscured_monster hit_immobile_boulder pushing/] => (
     is      => 'rw',
     isa     => 'Bool',
     default => 0,
 );
 
 # if the first movement is < or >, then just use the Ascend or Descend actions
-# if the first movement would move us into a monster, rest instead
+# if the first movement moves us into a boulder, record the fact
 around new => sub {
     my $orig  = shift;
     my $class = shift;
@@ -40,6 +40,10 @@ around new => sub {
     }
     elsif ($start eq '>') {
         $action = 'Descend';
+    }
+
+    if (TAEB->current_tile->at_direction($start)->has_boulder) {
+        $args{pushing} = 1;
     }
 
     if ($action) {
@@ -74,6 +78,18 @@ sub done {
 
     if ($walked) {
         TAEB->send_message('walked');
+
+        if ($self->pushing) {
+            # If we pushed a boulder, then if it's still there, it
+            # must be genuine.
+            TAEB->current_tile->known_genuine_boulder(0);
+            my $beyond =
+                TAEB->current_level->at_safe(
+                    TAEB->x * 2 - $self->starting_tile->x,
+                    TAEB->y * 2 - $self->starting_tile->y);
+            $beyond->known_genuine_boulder(1)
+                if $beyond && $beyond->has_boulder;
+        }
 
         # the rest applies only if we haven't moved
         return;
