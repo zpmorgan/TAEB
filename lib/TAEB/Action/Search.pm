@@ -24,6 +24,19 @@ sub done {
     TAEB->each_adjacent_inclusive(sub {
         my $self = shift;
         $self->inc_searched($diff);
+
+        # Searching when blind gives us more information.
+        # If a tile's next to 'floor' but not to 'corridor',
+        # and still shows up as a 'unexplored' after searching,
+        # it's probably not rock; set it to floor, while
+        # maintaining the ' ' glyph (the '.' is a floor_glyph).
+        # If it is rock, and we didn't see the corridor for some
+        # reason (say there was a monster on it), we'll notice
+        # when we try to move onto it via handle_items_in_rock.
+        if ($self->type eq 'unexplored' && TAEB->is_blind &&
+            ! $self->any_adjacent(sub {shift->type eq 'corridor'})) {
+            $self->change_type('floor' => '.');
+        }
     });
 }
 
