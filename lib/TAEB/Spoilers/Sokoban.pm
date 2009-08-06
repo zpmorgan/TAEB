@@ -403,7 +403,7 @@ sub probably_has_genuine_boulder {
     my $self = shift;
     my $tile = shift;
     return 0 unless $tile->has_boulder;
-    return 1 if $tile->type eq 'obscured';
+    return 1 if $tile->type eq 'obscured' || $tile->type eq 'rock';
     return 1 if $tile->known_genuine_boulder;
     return 0; # probably a mimic
 }
