@@ -423,6 +423,7 @@ sub handle_logging_in {
     }
     elsif ($self->topline =~ qr/, welcome( back)? to NetHack!/) {
         $self->new_game($1 ? 0 : 1);
+        $self->write(' ') if $self->topline =~ qr/--More--/;
         $self->state('playing');
         $self->paused(1) if $self->config->contents->{start_paused};
         $self->send_message('check');
