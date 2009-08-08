@@ -13,7 +13,7 @@ use constant tile_type => 'floor';
 use constant tile_subtype => undef;
 
 __PACKAGE__->parse_messages(
-    qr/You don't have anything to dip \b.*\b into./ => {
+    qr/You don't have anything to dip (?:\b.*\b )?into./ => {
     },
 );
 
