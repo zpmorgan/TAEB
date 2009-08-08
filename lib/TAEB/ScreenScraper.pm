@@ -601,6 +601,10 @@ our @msg_regex = (
             ['enter_room','temple'],
     ],
     [
+        qr/, welcome to Delphi!\"$/ =>
+            ['dungeon_level' => 'oracle'],
+    ],
+    [
         qr/^Some text has been (burned|melted) into the (?:.*) here\./ =>
             ['engraving_type' => sub { $1 } ],
     ],
