@@ -399,6 +399,20 @@ sub first_solvable_sokoban_level {
     });
 }
 
+sub number_of_solved_sokoban_levels {
+    my $self = shift;
+    my $count = 0;
+    TAEB->dungeon->shallowest_level(sub {
+        my $level = shift;
+        $level->known_branch
+            and $level->branch eq 'sokoban'
+            and $self->remaining_pits($level) == 0
+            and $count++;
+        0;
+    });
+    return $count;
+}
+
 sub probably_has_genuine_boulder {
     my $self = shift;
     my $tile = shift;
@@ -612,6 +626,10 @@ but that TAEB has encountered in the past.
 Returns the lowest level in Sokoban that can be solved from here
 (i.e. is not yet completely solved and has not been fatally messed up)
 but that TAEB has encountered in the past.
+
+=head2 number_of_solved_sokoban_levels -> Level
+
+Returns the number of Sokoban levels that have been solved.
 
 =head2 remaining_pits [Level] [Str] -> Int
 
