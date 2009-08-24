@@ -341,6 +341,8 @@ our %msg_string = (
         [status_change => levitation => 1],
     'You are floating high above the fountain.' =>
         [status_change => levitation => 1],
+    'Floating in the air, you miss wildly!'  =>
+        ['impeded_by_levitation'],
     'Your sacrifice sprouts wings and a propeller and roars away!' =>
         ['sacrifice_gone'],
     'Your sacrifice puffs up, swelling bigger and bigger, and pops!' =>
@@ -666,6 +668,10 @@ our @msg_regex = (
             ['resistance_change', 'sleep', 1],
     ],
     [
+        qr/^You (?:hurtle|float) in the opposite direction/ =>
+            ['hurtle'],
+    ],
+    [
         qr/Air currents pull you down into \w+ (hole|pit)!/ =>
             [dungeon_feature => trap => sub { $1 }],
     ],
@@ -807,6 +813,23 @@ our @exceptions = (
     qr/^You don't have anything to use or apply/=> 'missing_item',
     qr/^You don't have anything else to wear/   => 'missing_item',
     qr/^You are too hungry to cast that spell/  => 'hunger_cast',
+    qr/^You have nothing to brace yourself against/ => 'impeded_by_levitation',
+    # The next case is if we fail to kick something due to levitation,
+    # and simultaneously are trapped by a momement-preventing trap.
+    qr/^You are anchored by the/                => 'impeded_by_levitation',
+    qr/^You are floating high above the/        => 'impeded_by_levitation',
+    qr/^You don't have enough leverage to push the/ => 'impeded_by_levitation',
+    qr/^You wobble unsteadily for a moment/     => 'impeded_by_levitation',
+    qr/^You must be on the ground to spin a web/=> 'impeded_by_levitation',
+    # An unfortunate message collision here; this can happen both on the
+    # plane of Air without levitation, or using #sit with it. However,
+    # an impeded_by_levitation message when not levitating should normally
+    # be safely ignorable.
+    qr/^You tumble in place/                    => 'impeded_by_levitation',
+    # three cases for "you cannot reach the"; 'bottom' rules out picking
+    # up items from an escaped-from pit, the other two are for saddling
+    # and picking up items while levitating
+    qr/^You can(?:no|')t reach the (?!bottom)/  => 'impeded_by_levitation',
 );
 
 our @location_requests = (
@@ -933,6 +956,17 @@ sub handle_exceptions {
         TAEB->write($response);
         _recurse;
     }
+}
+
+# Error on exceptions that should have been caught earlier.
+sub exception_impeded_by_levitation {
+    if(TAEB->is_levitating) {
+        TAEB->log->scraper("An action failed due to levitation, but this wasn't ".
+                           "caught earlier", level => 'error');
+    } else {
+        TAEB->is_levitating(1);
+    }
+    return "\e\e\e";
 }
 
 sub handle_more {
