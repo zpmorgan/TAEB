@@ -1,7 +1,7 @@
 package TAEB::Display::Curses;
 use TAEB::OO;
 use Curses ();
-use TAEB::Util qw/:colors max tile_type_to_glyph tile_type_to_color display/;
+use TAEB::Util qw/:colors max tile_type_to_glyph tile_type_to_color display refaddr/;
 use Time::HiRes 'gettimeofday';
 
 extends 'TAEB::Display';
@@ -120,13 +120,15 @@ sub redraw {
     my $color_mode = $modes{$self->color_method} || {};
     my $glyph_mode = $modes{$self->glyph_method} || {};
 
-    my $glyph_fun = $glyph_mode->{glyph} || sub { shift->normal_glyph };
-    my $color_fun = $color_mode->{color} || sub { shift->normal_color };
+    my $glyph_fun = $glyph_mode->{glyph} || sub { $_[0]->normal_glyph };
+    my $color_fun = $color_mode->{color} || sub { $_[0]->normal_color };
 
     $color_mode->{onframe}() if $color_mode->{onframe};
     $glyph_mode->{onframe}() if $glyph_mode->{onframe} &&
         $color_mode != $glyph_mode;
 
+    my $curses_color;
+    my $lastcolorra = 0;
     for my $y (1 .. 21) {
         Curses::move($y, 0);
         for my $x (0 .. 79) {
@@ -136,9 +138,12 @@ sub redraw {
             # Note: $color and $glyph may not be mutated by this function,
             # as they may be memoized constant colours
 
-            my $curses_color = Curses::COLOR_PAIR($color->color)
-                                | ($color->bold    ? Curses::A_BOLD    : 0)
-                                | ($color->reverse ? Curses::A_REVERSE : 0);
+            my $colorra = refaddr $color;
+            $curses_color = Curses::COLOR_PAIR($color->color)
+                          | ($color->bold    ? Curses::A_BOLD    : 0)
+                          | ($color->reverse ? Curses::A_REVERSE : 0)
+                if $colorra != $lastcolorra;
+            $lastcolorra = $colorra;
 
             Curses::addch($curses_color | ord($glyph));
         }
