@@ -728,7 +728,9 @@ sub engraving_color {
 
 sub normal_glyph {
     my $self = shift;
-    $self->glyph eq ' ' ? $self->floor_glyph : $self->glyph;
+    my $glyph = $self->glyph;
+    return $glyph unless $glyph eq ' ';
+    return $self->floor_glyph;
 }
 
 sub farlooked {}
