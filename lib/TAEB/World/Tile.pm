@@ -238,7 +238,6 @@ sub update {
     my $newglyph    = shift;
     my $color       = shift;
     my $oldtype     = $self->type;
-    my $hadfriendly = $self->has_friendly;
 
     # gas spore explosions should not update the map
     # XXX what's this for?  we don't run the AI until we've seen all
