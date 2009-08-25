@@ -31,6 +31,8 @@ sub write {
 
 sub flush { }
 
+sub wait_for_termination { }
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -70,6 +72,18 @@ interface delays writes until the corresponding read. You can leave
 this un-overriden if it would be a no-op. It's allowed to discard any
 data it would otherwise read; this is for the purpose of ensuring that
 the data is sent during emergency cleanup.
+
+=head2 wait_for_termination
+
+This is an optional override, which should be implemented on those
+interfaces which run NetHack as a process themselves, rather than
+connecting to someone else's NetHack process over a network, for
+instance. Its purpose is to handle any errors NetHack may encounter
+when trying to save your game and/or save the high-score table; this
+is important because otherwise, the NetHack process itself can leave
+NetHack's internals in a mess, requiring recover to be run, or even
+preventing any updates to the high-score table until an administrator
+can fix NetHack's playfield.
 
 =cut
 

@@ -814,6 +814,9 @@ sub setup_handlers {
                 TAEB->save_state;
             }
         }
+        # A failsafe function that handles all the weird things that might
+        # happen during NetHack exiting, e.g. unavailable lockfile.
+        TAEB->interface->wait_for_termination;
         die $error;
     };
     TAEB->monkey_patch;
