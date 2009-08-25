@@ -133,6 +133,8 @@ sub redraw {
             my $tile = $level->at($x, $y);
             my $color = $color_fun->($tile);
             my $glyph = $glyph_fun->($tile);
+            # Note: $color and $glyph may not be mutated by this function,
+            # as they may be memoized constant colours
 
             my $curses_color = Curses::COLOR_PAIR($color->color)
                                 | ($color->bold    ? Curses::A_BOLD    : 0)

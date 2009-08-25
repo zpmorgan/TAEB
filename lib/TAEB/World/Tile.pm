@@ -1,6 +1,6 @@
 package TAEB::World::Tile;
 use TAEB::OO;
-use TAEB::Util qw/delta2vi vi2delta display :colors any all apply first/;
+use TAEB::Util qw/delta2vi vi2delta display display_ro :colors any all apply first/;
 
 with 'TAEB::Role::Reblessing';
 
@@ -640,30 +640,29 @@ sub is_engravable {
 sub normal_color {
     my $color = shift->color;
     $color = COLOR_WHITE if $color == COLOR_NONE;
-    return display($color);
+    return display_ro(color => $color);
 }
 
-sub item_display_color { display(shift->itemly_color) }
+sub item_display_color { display_ro(shift->itemly_color) }
 
 sub debug_color {
     my $self = shift;
+    my @reverse = ();
+    @reverse = (reverse => 1) if $self->type eq 'rock';
 
     my $color = $self->in_shop || $self->in_temple
-              ? display(color => COLOR_GREEN, bold => 1)
+              ? display_ro(color => COLOR_GREEN, bold => 1, @reverse)
               : $self->has_enemy
-              ? display(color => COLOR_RED, bold => 1)
+              ? display_ro(color => COLOR_RED, bold => 1, @reverse)
               : $self->is_interesting
-              ? display(COLOR_RED)
+              ? display_ro(color => COLOR_RED, @reverse)
               : $self->searched > 5
-              ? display(COLOR_CYAN)
+              ? display_ro(color => COLOR_CYAN, @reverse)
               : $self->stepped_on
-              ? display(COLOR_BROWN)
+              ? display_ro(color => COLOR_BROWN, @reverse)
               : $self->explored
-              ? display(COLOR_GREEN)
-              : display(COLOR_WHITE);
-
-    $color->reverse(1)
-        if $self->type eq 'rock'; # known rock, not unexplored
+              ? display_ro(color => COLOR_GREEN, @reverse)
+              : display_ro(color => COLOR_WHITE, @reverse);
 
     return $color;
 }
@@ -672,30 +671,30 @@ sub lit_color {
     my $self = shift;
 
     return $self->is_lit
-         ? display(COLOR_YELLOW)
+         ? display_ro(color => COLOR_YELLOW)
          : !defined $self->is_lit
-         ? display(COLOR_BROWN)
-         : display(color => COLOR_WHITE, bold => 1);
+         ? display_ro(color => COLOR_BROWN)
+         : display_ro(color => COLOR_WHITE, bold => 1);
 }
 
 sub los_color {
     my $self = shift;
 
     return $self->in_los
-         ? display(COLOR_YELLOW)
-         : display(color => COLOR_WHITE, bold => 1);
+         ? display_ro(color => COLOR_YELLOW)
+         : display_ro(color => COLOR_WHITE, bold => 1);
 }
 
 sub stepped_color {
     my $self = shift;
     my $stepped = $self->stepped_on;
 
-    return display(color => COLOR_WHITE, bold => 1) if $stepped == 0;
-    return display(COLOR_RED)                       if $stepped == 1;
-    return display(COLOR_ORANGE)                    if $stepped == 2;
-    return display(COLOR_BROWN)                     if $stepped < 5;
-    return display(COLOR_YELLOW)                    if $stepped < 8;
-    return display(COLOR_MAGENTA);
+    return display_ro(color => COLOR_WHITE, bold => 1) if $stepped == 0;
+    return display_ro(color => COLOR_RED)              if $stepped == 1;
+    return display_ro(color => COLOR_ORANGE)           if $stepped == 2;
+    return display_ro(color => COLOR_BROWN)            if $stepped < 5;
+    return display_ro(color => COLOR_YELLOW)           if $stepped < 8;
+    return display_ro(color => COLOR_MAGENTA);
 }
 
 sub time_color {
@@ -703,17 +702,17 @@ sub time_color {
     my $last_turn = $self->last_turn;
     my $dt = TAEB->turn - $last_turn;
 
-    return display(color => COLOR_WHITE, bold => 1)   if $last_turn == 0;
-    return display(COLOR_RED)                         if $dt > 1000;
-    return display(COLOR_ORANGE)                      if $dt > 500;
-    return display(COLOR_BROWN)                       if $dt > 100;
-    return display(COLOR_YELLOW)                      if $dt > 50;
-    return display(COLOR_MAGENTA)                     if $dt > 25;
-    return display(color => COLOR_MAGENTA, bold => 1) if $dt > 15;
-    return display(COLOR_GREEN)                       if $dt > 10;
-    return display(color => COLOR_GREEN, bold => 1)   if $dt > 5;
-    return display(COLOR_CYAN)                        if $dt > 3;
-    return display(color => COLOR_CYAN, bold => 1);
+    return display_ro(color => COLOR_WHITE, bold => 1)   if $last_turn == 0;
+    return display_ro(color => COLOR_RED)                if $dt > 1000;
+    return display_ro(color => COLOR_ORANGE)             if $dt > 500;
+    return display_ro(color => COLOR_BROWN)              if $dt > 100;
+    return display_ro(color => COLOR_YELLOW)             if $dt > 50;
+    return display_ro(color => COLOR_MAGENTA)            if $dt > 25;
+    return display_ro(color => COLOR_MAGENTA, bold => 1) if $dt > 15;
+    return display_ro(color => COLOR_GREEN)              if $dt > 10;
+    return display_ro(color => COLOR_GREEN, bold => 1)   if $dt > 5;
+    return display_ro(color => COLOR_CYAN)               if $dt > 3;
+    return display_ro(color => COLOR_CYAN, bold => 1);
 }
 
 sub engraving_color {
@@ -722,8 +721,8 @@ sub engraving_color {
     my $bold = $self->elbereths ? 1 : 0;
 
     return $engraving
-         ? display(color => COLOR_GREEN, bold => $bold)
-         : display(COLOR_BROWN);
+         ? display_ro(color => COLOR_GREEN, bold => $bold)
+         : display_ro(color => COLOR_BROWN);
 }
 
 sub normal_glyph {
