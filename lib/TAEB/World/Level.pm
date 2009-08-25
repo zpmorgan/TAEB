@@ -177,9 +177,11 @@ sub is_on_map {
 # XXX: Yes this REALLY sucks but it's an "easy" optimization
 sub at {
     my ($self, $x, $y) = @_;
-    my $cartographer = TAEB->dungeon->{cartographer};
-    $x = $cartographer->{x} unless defined $x;
-    $y = $cartographer->{y} unless defined $y;
+    if (!defined $x || !defined $y) {
+        my $cartographer = TAEB->dungeon->{cartographer};
+        $x = $cartographer->{x} unless defined $x;
+        $y = $cartographer->{y} unless defined $y;
+    }
 
     return $self->{tiles}->[$y][$x];
 }
