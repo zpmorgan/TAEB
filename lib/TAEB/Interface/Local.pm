@@ -64,7 +64,7 @@ augment read => sub {
     return $self->pty->recv;
 };
 
-sub flush { shift->pty->recv }
+sub flush { shift->pty->recv(2); }
 
 augment write => sub {
     my $self = shift;
