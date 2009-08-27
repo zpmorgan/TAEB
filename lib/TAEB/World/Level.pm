@@ -193,7 +193,10 @@ sub at_safe {
     my $self = shift;
     # note: i'm assuming here that the cartographer always makes sure our
     # position is on the map
-    return $self->at unless @_;
+    if(!@_) {
+        my $cartographer = TAEB->dungeon->cartographer;
+        return $self->at($cartographer->x, $cartographer->y) unless @_;
+    }
     my ($x, $y) = @_;
     return undef unless $self->is_on_map($x, $y);
     return $self->{tiles}->[$y][$x];

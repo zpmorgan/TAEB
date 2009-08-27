@@ -50,7 +50,8 @@ sub BUILD {
 
 sub current_tile {
     my $self = shift;
-    $self->current_level->at;
+    my $cartographer = $self->cartographer;
+    $self->current_level->at($cartographer->x, $cartographer->y);
 }
 
 for my $tiletype (qw/orthogonal diagonal adjacent adjacent_inclusive/) {

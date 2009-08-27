@@ -24,6 +24,8 @@ has fov => (
     isa       => 'ArrayRef',
     is        => 'ro',
     default   => sub { calculate_fov(TAEB->x, TAEB->y, sub {
+            defined $_[0] or $_[0] = TAEB->x,
+            defined $_[1] or $_[1] = TAEB->y,
             my $tile = TAEB->current_level->at(@_);
             $tile && $tile->is_transparent ? 1 : 0;
         }) },
