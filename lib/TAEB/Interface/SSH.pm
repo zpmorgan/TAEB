@@ -3,7 +3,7 @@ use TAEB::OO;
 
 use constant ping_wait => .3;
 
-extends 'TAEB::Interface::Local';
+extends 'TAEB::Interface::OldLocal';
 
 has server => (
     is      => 'ro',
