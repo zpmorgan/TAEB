@@ -197,11 +197,11 @@ has level_maps => (
 |...Gj..m....|         |.|
 -----.--------   ------|.|
  |..LrNuP...|  --|.....|.|
- |...v.O.ba.|  |.+.....|.|
+ |...v.O.ba.|  |*+.....|.|
  |.K.M.c.Q.|-  |-|.....|.|
--------.----   |.+.....+.|
+-------.----   |*+.....+.|
 |.gRh.ft.|     |-|.....|--
-|.e....d.|     |.+.....|
+|.e....d.|     |*+.....|
 |...|-----     --|.....|
 -----            -------
                 ),
@@ -237,11 +237,11 @@ has level_maps => (
 --..DE|f..PQd--        |.|
  |FgmG.n.|R..|   ------|.|
  |.HI.|..|scS| --|.....|.|
- |.JlK|--|bT.| |.+.....|.|
+ |.JlK|--|bT.| |*+.....|.|
  |...q.p.|..-- |-|.....|.|
- ----.Lo.|.--  |.+.....+.|
+ ----.Lo.|.--  |*+.....+.|
     ---.--.|   |-|.....|--
-     |.M..a|   |.+.....|
+     |.M..a|   |*+.....|
      |>.|..|   --|.....|
      -------     -------
                 ),
@@ -387,6 +387,15 @@ sub first_unsolved_sokoban_level {
             && $self->remaining_pits($level) > 0;
     });
 }
+sub last_solved_sokoban_level {
+    my $self = shift;
+    return TAEB->dungeon->deepest_level(sub {
+        my $level = shift;
+        return $level->known_branch
+            && $level->branch eq 'sokoban'
+            && $self->remaining_pits($level) == 0;
+    });
+}
 
 sub first_solvable_sokoban_level {
     my $self = shift;
@@ -420,6 +429,16 @@ sub probably_has_genuine_boulder {
     return 1 if $tile->type eq 'obscured' || $tile->type eq 'rock';
     return 1 if $tile->known_genuine_boulder;
     return 0; # probably a mimic
+}
+
+sub is_sokoban_reward_tile {
+    my $self = shift;
+    my $tile = shift;
+    my ($variant, $left, $top) = $self->recognise_sokoban_variant($tile->level);
+    my $map = $self->level_maps->{$variant}->{'map'};   
+    my $y = $tile->y - $top;
+    my $x = $tile->x - $left;
+    return $map->[$y]->[$x] == '*';
 }
 
 sub next_sokoban_step {
@@ -573,7 +592,7 @@ sub next_sokoban_step {
                     }
                 }
                 TAEB->log->spoilers("Sokoban: Skipped a move to $temptile due ".
-                                    "to pathing problems.");
+                                    "to pathing problems (pathable=$pathable).");
             }
 
             # Move one step through the plan.
@@ -597,7 +616,7 @@ sub next_sokoban_step {
                        "(expected $origboulder_locations, got " .
                        (join '-',@current_boulder_locations) . "), misplaced " .
                        (defined($misplaced_x) ? $misplaced_x : "undef"),
-                       level => 'warning');
+                       level => 'info');
     return;
 }
 
@@ -621,11 +640,16 @@ level.
 Returns the lowest level in Sokoban that is not yet completely solved
 but that TAEB has encountered in the past.
 
-=head2 first_solvable_sokoban_level -> Level
+=head2 last_solved_sokoban_level -> Level
+
+Returns the highest level in Sokoban that is now completely solved.
+
+=head2 first_solvable_sokoban_level [Pathable] -> Level
 
 Returns the lowest level in Sokoban that can be solved from here
 (i.e. is not yet completely solved and has not been fatally messed up)
-but that TAEB has encountered in the past.
+but that TAEB has encountered in the past. Pathable has the same
+meaning as with next_sokoban_step.
 
 =head2 number_of_solved_sokoban_levels -> Level
 
@@ -647,6 +671,11 @@ this returns true if we've pushed a boulder onto the square and
 haven't pushed it off again, or if the tile is obscured and appears to
 have a boulder; this handles all cases but that of a mimic visible
 when we arrive on the level, and a search should detect that.
+
+=head2 is_sokoban_reward_tile Tile -> Bool
+
+Returns true if the tile is one on which the reward item for Sokoban
+(the bag of holding or amulet of reflection) could be generated.
 
 =head2 next_sokoban_step Level [Pathable] -> Maybe Tile
 
