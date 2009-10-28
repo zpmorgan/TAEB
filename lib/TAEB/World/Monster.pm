@@ -384,6 +384,7 @@ sub average_melee_damage {
 sub average_actions_to_kill {
     my $self = shift;
     my $potential = shift;
+    return undef if !($self->possibilities);
     if (!defined $potential) {
     # TODO: allow for monster resistances
         my $weapon = TAEB->inventory->equipment->weapon;
@@ -396,8 +397,9 @@ sub average_actions_to_kill {
     }
     return if !$potential;
     # Hit dice are d8s, so average 4.5 sides each.
-    my $hp = (max map { $_->hitdice } $self->possibilities) * 4.5;
-    return $hp / $potential;
+    my $hd = (max map { $_->hitdice } $self->possibilities);
+    return if !$hd;
+    return $hd * 4.5 / $potential;
 }
 
 __PACKAGE__->meta->make_immutable;
