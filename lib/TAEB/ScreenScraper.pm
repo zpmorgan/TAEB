@@ -1029,6 +1029,7 @@ sub handle_attributes {
 sub handle_more_menus {
     my $self = shift;
     my $each;
+    my $afterloop;
     my $line_3 = 0;
 
     if (TAEB->topline =~ /^\s*Discoveries\s*$/) {
@@ -1043,6 +1044,8 @@ sub handle_more_menus {
         || ($line_3 = TAEB->vt->row_plaintext(2) =~ /Things that (?:are|you feel) here:/)
     ) {
         $self->messages($self->messages . '  ' . TAEB->topline) if $line_3;
+        my @olditemlist = TAEB->current_tile->items;
+        my @newitemlist = ();
         TAEB->announce('tile_noitems');
         $self->saw_floor_list_this_step(1);
         my $skip = 1;
@@ -1053,8 +1056,35 @@ sub handle_more_menus {
             return if $skip;
 
             my $item = TAEB->new_item($_);
-            TAEB->log->scraper("Adding $item to the current tile.");
-            TAEB->send_message('floor_item' => $item);
+            push @newitemlist, $item;
+        };
+        $afterloop = sub {
+            # Let's see if any items were already there; this avoids
+            # overwriting things like price and charge info. We assume
+            # the items stay in the same order on the floor; if they
+            # don't, they're probably different items. NetHack puts
+            # newly-dropped items on the /start/ of the list of items
+            # on the floor; TAEB puts newly seen items on the /end/ of
+            # its list. In other words, a newly dropped item will be
+            # at the start of the list, so we want to match the last
+            # item on the ground to the last item in the array.
+            my $newiter = $#newitemlist;
+            my $olditer = $#olditemlist;
+            # It's important to get the order right. This loop must
+            # go backwards...
+            while ($newiter >= 0 && $olditer >= 0) {
+                if ($newitemlist[$newiter]->maybe_is(
+                        $olditemlist[$olditer])) {
+                    $newitemlist[$newiter] = $olditemlist[$olditer];
+                }
+                $newiter--;
+                $olditer--;
+            }
+            # but this loop must go forwards.
+            for my $item (@newitemlist) {
+                TAEB->log->scraper("(Re)adding $item to the current tile.");
+                TAEB->send_message('floor_item' => $item);
+            }
             return 0;
         };
     }
@@ -1107,14 +1137,14 @@ sub handle_more_menus {
                 $begincol = length $1;
             }
             else {
-                _recurse if $iter > 1;
+                last if $iter > 1;
                 die "Unable to find --More-- on the end row: $lastrow_contents";
             }
 
             if ($iter > 1) {
                 # on subsequent iterations, the --More-- will be in the second
                 # column when the menu is continuing
-                _recurse if $begincol != 1;
+                last if $begincol != 1;
             }
 
             # now for each menu line, invoke the coderef
@@ -1127,6 +1157,8 @@ sub handle_more_menus {
             TAEB->write(' ');
             TAEB->process_input(0);
         }
+        $afterloop->() if $afterloop;
+        _recurse;
     }
 }
 
