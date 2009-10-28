@@ -437,8 +437,21 @@ our @msg_regex = (
     [
         qr/^You (?:see|feel) here (.*?)\./,
             ['floor_item', sub {
-                TAEB->announce('tile_noitems');
-                TAEB->new_item($1); }],
+                if (TAEB->current_tile->item_count == 1) {
+                    my $item = TAEB->new_item($1);
+                    if (@{TAEB->current_tile->items}[0]->maybe_is($item)) {
+                        TAEB->log->scraper("Not updating the $item here ".
+                                           "because it's consistent with ".
+                                           "what we thought was there.");
+                        return;
+                    } else {
+                        TAEB->announce('tile_noitems');
+                        return $item;
+                    }
+                } else {
+                    TAEB->announce('tile_noitems');
+                    return TAEB->new_item($1);
+                }}],
     ],
     [
         qr/^You read: \"(.*)\"\./,
