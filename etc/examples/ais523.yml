@@ -5,9 +5,12 @@
 ai: 'Planar'
 #ai: 'Quit'
 
+ai_options:
+    Planar:
+        overall_plan: DevNullSokobanMeta
 
-#interface: Local
-interface: Telnet
+interface: Local
+#interface: Telnet
 
 display: Curses
 
@@ -23,6 +26,10 @@ character:
     race: 'd'
     gender: 'f'
     align: 'l'
+#   role: 'r'
+#   race: 'o'
+#   gender: 'm'
+#   align: 'c'
 
 display_options:
     Curses:
