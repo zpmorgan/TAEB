@@ -427,7 +427,7 @@ sub msg_enter_room {
         my $tile = shift;
         return if abs($tile->x - $ltx) <= 1
                && abs($tile->y - $lty) <= 1;
-        return unless $tile->is_walkable(1);
+        return if $tile->is_inherently_unwalkable(1);
         push @possibly_inside, $tile;
     });
 
