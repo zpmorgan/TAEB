@@ -86,11 +86,12 @@ sub farlook {
     my $disposition = 'hostile';
     $disposition    = 'tame'     if $species =~ s/^tame //;
     $disposition    = 'peaceful' if $species =~ s/^peaceful //;
+
     $self->disposition($disposition);
-    # Coyotes have their farlook data in a different format. Yes, seriously.
-    # NetHack has far too many special cases...
-    $species =~ s/^(coyote).*/$1/;
-    $self->set_possibilities(name => $species);
+
+    my $parse = NetHack::Monster::Spoiler->parse_description($species);
+
+    $self->set_possibilities(name => $parse->{monster});
 }
 
 sub is_shk {
