@@ -10,6 +10,7 @@ requires 'Moose'                       => 0.90;
 requires 'MooseX::ABC'                 => 0.02;
 requires 'MooseX::AttributeHelpers'    => 0.09;
 requires 'MooseX::ClassAttribute'      => 0.07;
+requires 'MooseX::NonMoose'            => 0.07;
 requires 'MooseX::Role::Parameterized' => 0.06;
 requires 'MooseX::Role::Matcher'       => 0.03;
 requires 'MooseX::Singleton'           => 0.17;

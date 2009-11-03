@@ -104,9 +104,7 @@ has twitter => (
     },
 );
 
-around new => sub {
-    my $orig = shift;
-    my $self = $orig->(@_);
+sub BUILD {
     # we don't initialize log files until they're used, so need to make sure
     # old ones don't stick around
     $self->_clean_log_dir;
@@ -114,7 +112,6 @@ around new => sub {
     $self->warning;
     $self->error;
     $self->twitter;
-    return $self;
 };
 
 around twitter => sub {
@@ -325,7 +322,6 @@ sub _clean_log_dir {
     unlink for (glob logfile_for('*'));
 }
 
-# we need to use Log::Dispatch::Channels' constructor
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+__PACKAGE__->meta->make_immutable;
 
 1;

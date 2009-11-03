@@ -112,8 +112,7 @@ sub row_color {
     } $attrs =~ m{..}g;
 }
 
-# we need to use Term::VT102's constructor
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+__PACKAGE__->meta->make_immutable;
 
 1;
 
