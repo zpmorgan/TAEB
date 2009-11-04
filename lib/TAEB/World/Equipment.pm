@@ -33,7 +33,7 @@ subscribe now_wielding => sub {
     $self->weapon($item);
     $item->cursed(1) if $event->welded;
     $item->is_wielded(1);
-    TAEB->inventory->add($item->slot => $item);
+    TAEB->inventory->update($item->slot => $item);
 };
 
 __PACKAGE__->meta->make_immutable;
