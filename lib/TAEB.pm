@@ -479,7 +479,6 @@ sub human_input {
         if (defined $out) {
             $self->notify($out);
         }
-        0 while defined $self->try_key; # clear the keyboard buffer
     }
 }
 
@@ -592,22 +591,8 @@ sub keypress {
 
     # user input (for emergencies only)
     if ($c eq "\e") {
-        my $key = $self->get_key;
-        # Don't send an overriden [. The reason is because this is unlikely
-        # to be useful (it doesn't input any commands that do anything but
-        # make us think we picked up our wielded armour, confusing TAEB
-        # and not changing NetHack's gamestate), but it's very easy to
-        # set off by accident by turning the mouse wheel (which on some
-        # terminals simulates arrow keys).
-        if ($key ne '[') {
-            TAEB->log->main("Sending a key due to user emergency override",
-                            level => 'info');
-            $self->write($key);
-            return;
-        } else {
-            # Absorb the third member of the ^[[A, etc, combination.
-            $self->get_key;
-        }
+        $self->write($self->get_key);
+        return;
     }
 
     # refresh NetHack's screen
