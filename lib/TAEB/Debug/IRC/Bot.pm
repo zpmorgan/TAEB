@@ -1,5 +1,6 @@
 package TAEB::Debug::IRC::Bot;
 use TAEB::OO;
+use MooseX::NonMoose;
 use Time::HiRes qw/time/;
 # POE::Kernel and POE::Component::IRC use eval/die a bunch without
 # localizing it

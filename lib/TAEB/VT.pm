@@ -1,5 +1,6 @@
 package TAEB::VT;
 use TAEB::OO;
+use MooseX::NonMoose;
 extends 'Term::VT102::ZeroBased';
 
 has topline => (

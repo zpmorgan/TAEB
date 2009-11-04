@@ -2,6 +2,7 @@ package TAEB::Logger;
 use TAEB::OO;
 use Log::Dispatch::File;
 use Carp;
+use MooseX::NonMoose;
 use TAEB::Util qw/weaken/;
 extends 'Log::Dispatch::Channels';
 with 'TAEB::Role::Config';
