@@ -105,6 +105,7 @@ has twitter => (
 );
 
 sub BUILD {
+    my $self = shift;
     # we don't initialize log files until they're used, so need to make sure
     # old ones don't stick around
     $self->_clean_log_dir;
