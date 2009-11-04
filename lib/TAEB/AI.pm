@@ -192,7 +192,7 @@ Hook for the ';'-mode; example:
             my $map = shift; # a TAEB::Debug::Map object
             TAEB->ai->set_goal($map->tile);
             $map->topline("Goal set.");
-            0; # or 1 to force a redraw, or 'LAST' to exit ;-mode
+            0; # or 1 to force a redraw, or undef to exit ;-mode
         };
     }
 

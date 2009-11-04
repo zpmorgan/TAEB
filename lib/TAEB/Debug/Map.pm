@@ -72,7 +72,7 @@ sub tile {
     return $self->level->at($self->x, $self->y);
 }
 
-# Commands should return true if they need to force a redraw, or 'LAST'
+# Commands should return true if they need to force a redraw, or undef
 # if they are a terminator.
 
 my %normal_commands = (
@@ -83,7 +83,7 @@ my %normal_commands = (
                           $self->inc_x(8*$dx); $self->inc_y(8*$dy); 0; } }
          qw/h j k l y u b n/),
 
-    (map { $_ => sub { 'LAST' } } "\e", "\n", ";", ".", " ", "q", "Q"),
+    (map { $_ => sub { undef } } "\e", "\n", ";", ".", " ", "q", "Q"),
 
     '<' => sub { my $self = shift; $self->z_with_branch($self->z - 1); 1 },
     '>' => sub { my $self = shift; $self->z_with_branch($self->z + 1); 1 },
@@ -137,7 +137,7 @@ sub activate {
 
         if ($commands{$c}) {
             $redraw = $commands{$c}->($self);
-            last if $redraw eq 'LAST';
+            last if !defined($redraw);
         } else {
             $self->topline("Unknown command '$c'");
             $redraw = 0;
