@@ -70,7 +70,6 @@ sub update {
     return unless $self->check_dlvl;
 
     my $level = $self->dungeon->current_level;
-    my $rogue_nonblind = $level->is_rogue && !TAEB->is_blind;
 
     my $tile_changed = 0;
 
@@ -78,7 +77,7 @@ sub update {
         my ($tile, $glyph, $color, $x, $y) = @_;
 
         $tile->_clear_monster if $tile->has_monster;
-        $tile->try_monster($glyph, $color, $level, $rogue_nonblind)
+        $tile->try_monster($glyph, $color)
             unless $Tx == $x && $Ty == $y;
 
         if ($glyph ne $tile->glyph || $color != $tile->color) {
