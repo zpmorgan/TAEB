@@ -2,8 +2,8 @@ package TAEB::Action::Descend;
 use TAEB::OO;
 extends 'TAEB::Action::Ascend';
 
-sub command {'>'}
-sub complement_type {'stairsup' => '<'}
+use constant command => '>';
+use constant complement_type => 'stairsup' => '<';
 
 after done => sub {
     my $self    = shift;

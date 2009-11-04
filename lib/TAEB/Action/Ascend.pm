@@ -2,8 +2,8 @@ package TAEB::Action::Ascend;
 use TAEB::OO;
 extends 'TAEB::Action::Move';
 
-sub command {'<'}
-sub complement_type {'stairsdown' => '>'}
+use constant command => '<';
+use constant complement_type => 'stairsdown' => '>';
 
 has '+direction' => (
     default  => sub { shift->command },
