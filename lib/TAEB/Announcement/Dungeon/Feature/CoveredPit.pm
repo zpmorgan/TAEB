@@ -7,7 +7,7 @@ with 'TAEB::Announcement::Dungeon::Feature' => {
     target_type => 'next',
 };
 
-use constant name => 'covered pit';
+use constant name => 'covered_pit';
 use constant type => 'floor';
 use constant tile_type => 'floor';
 use constant tile_subtype => undef;

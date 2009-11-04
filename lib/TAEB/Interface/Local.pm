@@ -64,7 +64,51 @@ augment read => sub {
     return $self->pty->recv;
 };
 
-sub flush { shift->pty->recv }
+sub flush { shift->pty->recv(2); }
+
+sub wait_for_termination {
+    my $self = shift;
+    my $pty = $self->pty;
+    $pty->recv(2); # give it time to save
+    return unless $pty->is_active;
+    TAEB->log->input("Trying to handle unclean NetHack shutdown...");
+    # Send NetHack a SIGHUP first in case we turn out not to have sent a
+    # save/quit command after all; this is just sanity, really. NetHack
+    # puts up a confirm message on SIGINT, but exits immediately on SIGHUP.
+    $pty->kill(HUP => 0);
+    # Failing that, it may be stuck in a lockfile loop, in which case we
+    # don't want to kill it until it's found the lock it needs. (This could
+    # theoretically happen on a heavy-traffic computer, and could also
+    # happen trying to save high-scores if there are incorrectly-terminated
+    # NetHack process around. The trick here is that NetHack will print a
+    # message every second, /without waiting for input/, if the lockfile
+    # is stuck; and in such cases, we don't want to kill the process
+    # because the dumpfile is halfway through being written. So how do
+    # we distinguish between the possible cases? Well, either NetHack's
+    # finished a SIGHUP save already, or was just being slow saving
+    # beforehand, or is in a record_lock loop. We ask for a read with a
+    # 3-second timeout, then see if the process has ended; if it's
+    # ended, then it's finished saving, and otherwise it's waiting for
+    # its record file.
+    $pty->recv(3);
+    return unless $pty->is_active;
+    # NetHack will wait for up to a minute to get its lockfile. We've
+    # waited 5 seconds already; let's wait another 66 just to be sure,
+    # notifying the user as to why there's such an unusually long wait.
+    TAEB->display->deinitialize if defined TAEB->display;
+    my $wait = 66;
+    while($wait > 0) {
+        TAEB->log->input("Waiting for termination ($wait seconds remaining)...");
+        print "Something went wrong when NetHack tried to save.\n";
+        print "Waiting up to another $wait seconds...   \n";
+        $pty->recv(3);
+        return unless $pty->is_active;
+        $wait -= 3;
+    }
+    TAEB->log->input("Killing a hanging process...");
+    print "The NetHack process appears to be hanging, killing it...\n";
+    $pty->close;
+}
 
 augment write => sub {
     my $self = shift;

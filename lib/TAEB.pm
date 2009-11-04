@@ -423,7 +423,9 @@ sub handle_logging_in {
     }
     elsif ($self->topline =~ qr/, welcome( back)? to NetHack!/) {
         $self->new_game($1 ? 0 : 1);
+        $self->write(' ') if $self->topline =~ qr/--More--/;
         $self->state('playing');
+        $self->paused(1) if $self->config->contents->{start_paused};
         $self->send_message('check');
         $self->send_message('game_started');
     }
@@ -477,6 +479,7 @@ sub human_input {
         if (defined $out) {
             $self->notify($out);
         }
+        0 while defined $self->try_key; # clear the keyboard buffer
     }
 }
 
@@ -589,8 +592,22 @@ sub keypress {
 
     # user input (for emergencies only)
     if ($c eq "\e") {
-        $self->write($self->get_key);
-        return;
+        my $key = $self->get_key;
+        # Don't send an overriden [. The reason is because this is unlikely
+        # to be useful (it doesn't input any commands that do anything but
+        # make us think we picked up our wielded armour, confusing TAEB
+        # and not changing NetHack's gamestate), but it's very easy to
+        # set off by accident by turning the mouse wheel (which on some
+        # terminals simulates arrow keys).
+        if ($key ne '[') {
+            TAEB->log->main("Sending a key due to user emergency override",
+                            level => 'info');
+            $self->write($key);
+            return;
+        } else {
+            # Absorb the third member of the ^[[A, etc, combination.
+            $self->get_key;
+        }
     }
 
     # refresh NetHack's screen
@@ -797,6 +814,9 @@ sub setup_handlers {
                 TAEB->save_state;
             }
         }
+        # A failsafe function that handles all the weird things that might
+        # happen during NetHack exiting, e.g. unavailable lockfile.
+        TAEB->interface->wait_for_termination;
         die $error;
     };
     TAEB->monkey_patch;

@@ -24,6 +24,8 @@ has fov => (
     isa       => 'ArrayRef',
     is        => 'ro',
     default   => sub { calculate_fov(TAEB->x, TAEB->y, sub {
+            defined $_[0] or $_[0] = TAEB->x,
+            defined $_[1] or $_[1] = TAEB->y,
             my $tile = TAEB->current_level->at(@_);
             $tile && $tile->is_transparent ? 1 : 0;
         }) },
@@ -64,6 +66,7 @@ sub update {
     return unless $self->check_dlvl;
 
     my $level = $self->dungeon->current_level;
+    my $rogue_nonblind = $level->is_rogue && !TAEB->is_blind;
 
     my $tile_changed = 0;
 
@@ -71,7 +74,7 @@ sub update {
         my ($tile, $glyph, $color, $x, $y) = @_;
 
         $tile->_clear_monster if $tile->has_monster;
-        $tile->try_monster($glyph, $color)
+        $tile->try_monster($glyph, $color, $level, $rogue_nonblind)
             unless $Tx == $x && $Ty == $y;
 
         if ($glyph ne $tile->glyph || $color != $tile->color) {
@@ -424,7 +427,7 @@ sub msg_enter_room {
         my $tile = shift;
         return if abs($tile->x - $ltx) <= 1
                && abs($tile->y - $lty) <= 1;
-        return unless $tile->is_walkable(1);
+        return if $tile->is_inherently_unwalkable(1);
         push @possibly_inside, $tile;
     });
 

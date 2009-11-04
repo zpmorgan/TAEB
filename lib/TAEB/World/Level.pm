@@ -106,6 +106,22 @@ has fully_explored => (
     default => 0,
 );
 
+# Some information about the history of a Sokoban level needs to be
+# retained in order to be able to solve it correctly. There's no
+# reason we can't count the number of eliminated pit/hole traps on
+# other levels too (could come in useful on the VoTD, for instance).
+has pit_and_hole_traps_untrapped => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0,
+);
+
+subscribe covered_pit => sub {
+    my $self = shift;
+    $self->pit_and_hole_traps_untrapped(
+        $self->pit_and_hole_traps_untrapped + 1);
+};
+
 # Note that the quest portal can be on the rogue level, so this can't
 # be just another special level.
 has has_quest_portal => (
@@ -129,7 +145,7 @@ has _astar_cache => (
 #    undef => maybe that level?
 #
 
-our @special_levels = qw/minetown rogue oracle bigroom/;
+our @special_levels = qw/minetown rogue oracle bigroom minend/;
 
 for my $level (@special_levels) {
     has "is_$level" => (
@@ -161,10 +177,6 @@ sub is_on_map {
 # XXX: Yes this REALLY sucks but it's an "easy" optimization
 sub at {
     my ($self, $x, $y) = @_;
-    my $cartographer = TAEB->dungeon->{cartographer};
-    $x = $cartographer->{x} unless defined $x;
-    $y = $cartographer->{y} unless defined $y;
-
     return $self->{tiles}->[$y][$x];
 }
 
@@ -175,7 +187,10 @@ sub at_safe {
     my $self = shift;
     # note: i'm assuming here that the cartographer always makes sure our
     # position is on the map
-    return $self->at unless @_;
+    if(!@_) {
+        my $cartographer = TAEB->dungeon->cartographer;
+        return $self->at($cartographer->x, $cartographer->y) unless @_;
+    }
     my ($x, $y) = @_;
     return undef unless $self->is_on_map($x, $y);
     return $self->{tiles}->[$y][$x];
@@ -446,6 +461,7 @@ sub matches_vt {
                  && $tile->type ne 'rock'
                  && $tile->type ne 'unexplored'
                  && $tile->type ne 'obscured'
+                 && $tile->glyph ne ' '
                  && $tile->type ne 'floor';
 
         return 1;

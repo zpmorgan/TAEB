@@ -636,6 +636,11 @@ sub strength_damage_bonus {
     else                     { return 6  }
 }
 
+sub accuracy_bonus {
+    # XXX: everything
+    return 0;
+}
+
 sub item_damage_bonus {
     # XXX: include rings of increase damage, etc here
     return 0;

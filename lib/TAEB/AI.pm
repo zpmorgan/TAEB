@@ -99,6 +99,8 @@ sub select_identify {
 
 sub drawing_modes {}
 
+sub map_commands {}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -180,6 +182,19 @@ Hook for AI-specific drawing modes. Example:
 
 Also available are 'immediate', which is run by the select menu,
 and 'onframe', which is run before each colorized frame.
+
+=head2 map_commands
+
+Hook for the ';'-mode; example:
+
+    sub map_commands {
+        g => sub {
+            my $map = shift; # a TAEB::Debug::Map object
+            TAEB->ai->set_goal($map->tile);
+            $map->topline("Goal set.");
+            0; # or 1 to force a redraw, or 'LAST' to exit ;-mode
+        };
+    }
 
 =cut
 

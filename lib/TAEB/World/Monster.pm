@@ -1,6 +1,7 @@
 package TAEB::World::Monster;
 use TAEB::OO;
 use TAEB::Util qw/:colors align2str max min any all string_color/;
+use TAEB::Spoilers::Combat;
 
 use overload %TAEB::Meta::Overload::default;
 
@@ -85,11 +86,12 @@ sub farlook {
     my $disposition = 'hostile';
     $disposition    = 'tame'     if $species =~ s/^tame //;
     $disposition    = 'peaceful' if $species =~ s/^peaceful //;
+
     $self->disposition($disposition);
-    # Coyotes have their farlook data in a different format. Yes, seriously.
-    # NetHack has far too many special cases...
-    $species =~ s/^(coyote).*/$1/;
-    $self->set_possibilities(name => $species);
+
+    my $parse = NetHack::Monster::Spoiler->parse_description($species);
+
+    $self->set_possibilities(name => $parse->{monster});
 }
 
 sub is_shk {
@@ -380,6 +382,27 @@ sub average_melee_damage {
     return max map { ($_->_read_attack_string)[0] } shift->possibilities;
 }
 
+sub average_actions_to_kill {
+    my $self = shift;
+    my $potential = shift;
+    return undef if !($self->possibilities);
+    if (!defined $potential) {
+    # TODO: allow for monster resistances
+        my $weapon = TAEB->inventory->equipment->weapon;
+        # TODO: The framework doesn't support twoweaponing well yet,
+        # so ignore the secondary weapon for now.
+        # TODO: allow for monster size
+        $potential = defined $weapon
+                   ? TAEB::Spoilers::Combat->damage($weapon)
+                   : TAEB::Spoilers::Combat->damage('-');
+    }
+    return if !$potential;
+    # Hit dice are d8s, so average 4.5 sides each.
+    my $hd = (max map { $_->hitdice } $self->possibilities);
+    return if !$hd;
+    return $hd * 4.5 / $potential;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -408,6 +431,19 @@ connects and does full damage with each hit?
 
 How much damage can this monster do in a single round of attacks in
 the average case, accounting for AC?
+
+=head2 average_actions_to_kill [Num] :: Num
+
+How many actions will it take to kill this monster, on average?
+Returns undef if we cannot hurt this monster, and the number of
+actions (that is, F or t commands) it will take otherwise. If given,
+the argument is the average damage per round TAEB can deal to the
+monster; otherwise, TAEB's current weapon damage will be used
+(eventually this should allow for the monster's resistances, but at
+present it doesn't). If it's unclear what sort of monster is on the
+square, the worst possible case will be taken. This function is
+unlikely to give a sensible result when hallucinating or on monsters
+seen through warning.
 
 =cut
 
