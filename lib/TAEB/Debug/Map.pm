@@ -13,7 +13,7 @@ for my $name (qw/x y z z_index/) {
         metaclass => 'Counter',
         isa       => 'Int',
         is        => 'rw',
-        provides  => { inc => "d$name" },
+        provides  => { inc => "inc_$name" },
     );
 }
 
@@ -78,16 +78,16 @@ sub tile {
 my %normal_commands = (
     (map { my ($dx, $dy) = vi2delta $_;
            $_    => sub { my $self = shift;
-                          $self->dx($dx); $self->dy($dy); 0; },
+                          $self->inc_x($dx); $self->inc_y($dy); 0; },
            uc $_ => sub { my $self = shift;
-                          $self->dx(8*$dx); $self->dy(8*$dy); 0; } }
+                          $self->inc_x(8*$dx); $self->inc_y(8*$dy); 0; } }
          qw/h j k l y u b n/),
 
     (map { $_ => sub { 'LAST' } } "\e", "\n", ";", ".", " ", "q", "Q"),
 
     '<' => sub { my $self = shift; $self->z_with_branch($self->z - 1); 1 },
     '>' => sub { my $self = shift; $self->z_with_branch($self->z + 1); 1 },
-    'v' => sub { shift->dz_index(+1); 1 },
+    'v' => sub { shift->inc_z_index(+1); 1 },
     'i' => sub {
         my $tile = shift->tile;
         my @items = $tile->items;
