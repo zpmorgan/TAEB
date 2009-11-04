@@ -10,10 +10,10 @@ subscribe keypress => sub {
 
 for my $name (qw/x y z z_index/) {
     has $name => (
-        metaclass => 'Counter',
-        isa       => 'Int',
-        is        => 'rw',
-        provides  => { inc => "inc_$name" },
+        traits  => ['Counter'],
+        isa     => 'Int',
+        is      => 'rw',
+        handles => { "inc_$name" => 'inc' },
     );
 }
 

@@ -8,15 +8,15 @@ use overload %TAEB::Meta::Overload::default;
 my @slots = ('a' .. 'z', 'A' .. 'Z');
 
 has _spells => (
-    traits    => ['MooseX::AttributeHelpers::Trait::Collection::Hash'],
-    isa       => 'HashRef[TAEB::World::Spell]',
-    default   => sub { {} },
-    provides  => {
-        get    => 'get',
-        set    => 'set',
-        values => 'spells',
-        keys   => 'slots',
-        empty  => 'has_spells',
+    traits  => ['Hash'],
+    isa     => 'HashRef[TAEB::World::Spell]',
+    default => sub { {} },
+    handles => {
+        get        => 'get',
+        set        => 'set',
+        spells     => 'values',
+        slots      => 'keys',
+        has_spells => 'count',
     },
 );
 

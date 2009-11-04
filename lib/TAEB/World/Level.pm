@@ -59,16 +59,16 @@ has z => (
 );
 
 has monsters => (
-    metaclass  => 'Collection::Array',
+    traits     => ['Array'],
     is         => 'ro',
     isa        => 'ArrayRef[TAEB::World::Monster]',
     auto_deref => 1,
     default    => sub { [] },
-    provides   => {
-        push   => 'add_monster',
-        clear  => 'clear_monsters',
-        empty  => 'has_monsters',
-        count  => 'monster_count',
+    handles    => {
+        add_monster    => 'push',
+        clear_monsters => 'clear',
+        has_monsters   => 'count', # XXX: probably just drop this?
+        monster_count  => 'count',
     }
 );
 
@@ -90,13 +90,13 @@ has tiles_by_type => (
 );
 
 has items => (
-    metaclass  => 'Collection::Array',
+    traits     => ['Array'],
     is         => 'ro',
     isa        => 'ArrayRef[NetHack::Item]',
     default    => sub { [] },
     auto_deref => 1,
-    provides   => {
-        count  => 'item_count',
+    handles    => {
+        item_count  => 'count',
     },
 );
 

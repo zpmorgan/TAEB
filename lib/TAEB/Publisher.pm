@@ -14,23 +14,23 @@ has _subscribers => (
 );
 
 has queued_messages => (
-    metaclass => 'Collection::Array',
-    is        => 'ro',
-    isa       => 'ArrayRef',
-    default   => sub { [] },
-    provides  => {
-        push  => '_push_queued_messages',
-        shift => '_shift_queued_messages',
+    traits  => ['Array'],
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    handles => {
+        _push_queued_messages  => 'push',
+        _shift_queued_messages => 'shift',
     },
 );
 
 has is_paused => (
-    metaclass => 'Bool',
-    is        => 'rw',
-    isa       => 'Bool',
-    provides  => {
-        set   => 'pause',
-        unset => 'unpause',
+    traits  => ['Bool'],
+    is      => 'rw',
+    isa     => 'Bool',
+    handles => {
+        pause   => 'set',
+        unpause => 'unset',
     },
 );
 

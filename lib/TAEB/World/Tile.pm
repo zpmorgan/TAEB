@@ -127,16 +127,16 @@ has monster => (
 );
 
 has items => (
-    metaclass  => 'Collection::Array',
+    traits     => ['Array'],
     is         => 'ro',
     isa        => 'ArrayRef[NetHack::Item]',
     default    => sub { [] },
     auto_deref => 1,
-    provides   => {
-        push   => 'add_item',
-        clear  => 'clear_items',
-        delete => 'remove_item',
-        count  => 'item_count',
+    handles    => {
+        add_item    => 'push',
+        clear_items => 'clear',
+        remove_item => 'delete',
+        item_count  => 'count',
     },
 );
 
@@ -188,13 +188,13 @@ has is_lit => (
 );
 
 has kill_times => (
-    metaclass => 'Collection::Array',
-    is        => 'ro',
-    isa       => 'ArrayRef',
-    default   => sub { [] },
-    provides  => {
-        push  => '_add_kill_time',
-        clear => '_clear_kill_times',
+    traits  => ['Array'],
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    handles => {
+        _add_kill_time    => 'push',
+        _clear_kill_times => 'clear',
     },
     documentation => "Kills which have been committed on this tile.  " .
         "Each element is an arrayref with a monster name, a turn number, " .

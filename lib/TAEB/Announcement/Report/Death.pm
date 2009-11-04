@@ -3,14 +3,14 @@ use TAEB::OO;
 extends 'TAEB::Announcement::Report';
 
 has conducts => (
-    metaclass  => 'Collection::Array',
+    traits     => ['Array'],
     is         => 'ro',
     isa        => 'ArrayRef',
     lazy       => 1,
     default    => sub { [] },
     auto_deref => 1,
-    provides   => {
-        push => 'add_conduct',
+    handles    => {
+        add_conduct => 'push',
     },
 );
 
