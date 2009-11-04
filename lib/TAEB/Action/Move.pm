@@ -83,10 +83,10 @@ sub done {
             # If we pushed a boulder, then if it's still there, it
             # must be genuine.
             TAEB->current_tile->known_genuine_boulder(0);
-            my $beyond =
-                TAEB->current_level->at_safe(
-                    TAEB->x * 2 - $self->starting_tile->x,
-                    TAEB->y * 2 - $self->starting_tile->y);
+            my $beyond = TAEB->current_level->at_safe(
+                TAEB->x * 2 - $self->starting_tile->x,
+                TAEB->y * 2 - $self->starting_tile->y,
+            );
             $beyond->known_genuine_boulder(1)
                 if $beyond && $beyond->has_boulder;
         }

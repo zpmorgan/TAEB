@@ -23,12 +23,16 @@ has y => (
 has fov => (
     isa       => 'ArrayRef',
     is        => 'ro',
-    default   => sub { calculate_fov(TAEB->x, TAEB->y, sub {
-            defined $_[0] or $_[0] = TAEB->x,
-            defined $_[1] or $_[1] = TAEB->y,
-            my $tile = TAEB->current_level->at(@_);
-            $tile && $tile->is_transparent ? 1 : 0;
-        }) },
+    default   => sub {
+        calculate_fov(TAEB->x, TAEB->y, sub {
+            my @coords = @_;
+            $coords[0] = TAEB->x unless defined $coords[0];
+            $coords[1] = TAEB->y unless defined $coords[1];
+            my $tile = TAEB->current_level->at(@coords);
+            return unless $tile;
+            return $tile->is_transparent;
+        })
+    },
     clearer   => 'invalidate_fov',
     lazy      => 1,
 );

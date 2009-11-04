@@ -119,7 +119,8 @@ has pit_and_hole_traps_untrapped => (
 subscribe covered_pit => sub {
     my $self = shift;
     $self->pit_and_hole_traps_untrapped(
-        $self->pit_and_hole_traps_untrapped + 1);
+        $self->pit_and_hole_traps_untrapped + 1
+    );
 };
 
 # Note that the quest portal can be on the rogue level, so this can't

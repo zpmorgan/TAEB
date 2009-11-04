@@ -11,11 +11,12 @@ has align => (
 
 sub debug_color {
     my $self = shift;
+    my $align = $self->align;
 
-    if (defined $self->align) {
-        return display(COLOR_RED)   if $self->align eq 'Cha';
-        return display(COLOR_GREEN) if $self->align eq 'Neu';
-        return display(COLOR_CYAN)  if $self->align eq 'Law';
+    if (defined $align) {
+        return display(COLOR_RED)   if $align eq 'Cha';
+        return display(COLOR_GREEN) if $align eq 'Neu';
+        return display(COLOR_CYAN)  if $align eq 'Law';
     }
 
     return display(COLOR_MAGENTA);
