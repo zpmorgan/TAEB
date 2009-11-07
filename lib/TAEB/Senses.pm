@@ -746,8 +746,8 @@ subscribe debt => sub {
     # gold is occasionally undefined. that's okay, that tells us to check
     # how much we owe with the $ command
     if (!defined($amount)) {
-        TAEB->send_message(check => 'debt');
         $self->_clear_debt;
+        TAEB->send_message(check => 'debt');
     }
     else {
         $self->debt($amount);
