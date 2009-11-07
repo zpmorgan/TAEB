@@ -42,9 +42,12 @@ has initialized => (
 sub institute {
     shift->initialized(1);
 
+    $ENV{'ESCDELAY'} ||= 50; #talk about gross argument passing conventions
     Curses::initscr;
     Curses::noecho;
     Curses::cbreak;
+    Curses::meta(Curses::stdscr, 1);
+    Curses::keypad(Curses::stdscr, 1);
     Curses::start_color;
     Curses::use_default_colors;
     Curses::init_pair($_, $_, 0) for 0 .. 7;
