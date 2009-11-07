@@ -39,6 +39,7 @@ sub done {
     }
 
     $self->item->is_worn(1);
+    TAEB->send_message("check" => "inventory"); # for enchantments, etc
 }
 
 __PACKAGE__->meta->make_immutable;
