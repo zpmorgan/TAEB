@@ -338,7 +338,7 @@ sub msg_item_price {
 sub msg_remove_floor_item {
     my $self = shift;
     my $item = shift;
-    my $tile = TAEB->current_tile;
+    my $tile = shift || TAEB->current_tile;
 
     for my $i (0 .. $tile->item_count - 1) {
         my $tile_item = $tile->items->[$i];

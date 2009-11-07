@@ -9,6 +9,12 @@ has '+food' => (
     required => 1,
 );
 
+has tile => (
+    is      => 'ro',
+    isa     => 'TAEB::World::Tile',
+    default => sub { TAEB->current_tile },
+);
+
 sub respond_eat_ground {
     my $self = shift;
     my $floor = shift;
@@ -59,7 +65,7 @@ sub done {
     else {
         #This doesn't work well with a stack of corpses on the floor
         #because maybe_is used my remove_floor_item tries to match quantity
-        TAEB->send_message(remove_floor_item => $item);
+        TAEB->send_message(remove_floor_item => $item, $self->tile);
     }
 
     my $old_nutrition = TAEB->nutrition;
