@@ -231,6 +231,12 @@ has death_report => (
     default => sub { TAEB::Announcement::Report::Death->new },
 );
 
+has is_friday_13th => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
+
 sub parse_botl {
     my $self = shift;
     my $status = TAEB->vt->row_plaintext(22);
@@ -410,8 +416,10 @@ sub msg_god_angry {
 
 sub can_pray {
     my $self = shift;
+    # TODO This should use real luck tracking.
     return $self->max_god_anger == 0
         && TAEB->turn > $self->last_prayed + 500
+        && !$self->is_friday_13th
 }
 
 sub can_engrave {
@@ -728,6 +736,11 @@ subscribe protection_dec => sub {
 subscribe protection_gone => sub {
     my $self = shift;
     $self->spell_protection(0);
+};
+
+subscribe friday_13th => sub {
+   my $self = shift;
+   $self->is_friday_13th(1);
 };
 
 sub has_infravision {
