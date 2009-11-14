@@ -496,21 +496,23 @@ sub msg_walked {
 
 subscribe turn => sub {
     my $self = shift;
+    my $event = shift;
+
     $self->nutrition($self->nutrition - 1);
-    # XXX This needs the turn number in the turn announcement to work
     # TODO Full moon is +1
-    #my $baseluck = $self->is_friday_13th ? -1 : 0;
-    #my $luck = $self->luck;
+    my $baseluck = $self->is_friday_13th ? -1 : 0;
+    my $luck = $self->luck;
     # TODO AoY affects this too
-    #my $luckturns = $self->max_god_anger != 0 ? 300 : 600;
-    #if ($luck != $baseluck && $turn % $luckturns == 0) {
-    #    # TODO Luckstones prevent timeing out
-    #    if ($luck > $baseluck)
-    #        $luck--;
-    #    else if ($luck < $baseluck)
-    #        $luck++;
-    #    $self->luck($luck);
-    #}
+    my $luckturns = $self->max_god_anger != 0 ? 300 : 600;
+    if ($luck != $baseluck && $event->turn_number % $luckturns == 0) {
+        # TODO Luckstones prevent timeing out
+        if ($luck > $baseluck) {
+            $luck--;
+        } elsif ($luck < $baseluck) {
+            $luck++;
+        }
+        $self->luck($luck);
+    }
 };
 
 my %method_of = (
