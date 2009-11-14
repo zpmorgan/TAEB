@@ -387,7 +387,8 @@ sub update {
     if ($self->prev_turn) {
         if ($self->turn != $self->prev_turn) {
             for ($self->prev_turn + 1 .. $self->turn) {
-                TAEB->send_message(turn => TAEB::Announcement::Turn->new);
+                TAEB->send_message(
+                    turn => TAEB::Announcement::Turn->new(turn_number => $_));
             }
         }
     }
