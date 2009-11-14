@@ -94,6 +94,12 @@ has max_god_anger => (
     default => 0,
 );
 
+has luck => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0,
+);
+
 has in_beartrap => (
     is      => 'rw',
     isa     => 'Bool',
@@ -416,10 +422,10 @@ sub msg_god_angry {
 
 sub can_pray {
     my $self = shift;
-    # TODO This should use real luck tracking.
+
     return $self->max_god_anger == 0
         && TAEB->turn > $self->last_prayed + 500
-        && !$self->is_friday_13th
+        && $self->luck >= 0
 }
 
 sub can_engrave {
@@ -741,6 +747,7 @@ subscribe protection_gone => sub {
 subscribe friday_13th => sub {
    my $self = shift;
    $self->is_friday_13th(1);
+   $self->luck($self->luck - 1);
 };
 
 sub has_infravision {
