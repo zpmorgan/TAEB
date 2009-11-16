@@ -94,7 +94,7 @@ has max_god_anger => (
     default => 0,
 );
 
-has luck => (
+has baseluck => (
     is      => 'rw',
     isa     => 'Int',
     default => 0,
@@ -421,6 +421,15 @@ sub msg_god_angry {
     $self->max_god_anger($max_anger);
 }
 
+sub luck {
+    my $self = shift;
+    my $luck = $self->baseluck;
+    $luck-- if $self->is_friday_13th;
+    # TODO Full moon is +1
+    # TODO Extra luck from luckstones
+    return $luck;
+}
+
 sub can_pray {
     my $self = shift;
 
@@ -499,19 +508,18 @@ subscribe turn => sub {
     my $event = shift;
 
     $self->nutrition($self->nutrition - 1);
-    # TODO Full moon is +1
-    my $baseluck = $self->is_friday_13th ? -1 : 0;
-    my $luck = $self->luck;
+
+    my $luck = $self->baseluck;
     # TODO AoY affects this too
     my $luckturns = $self->max_god_anger != 0 ? 300 : 600;
-    if ($luck != $baseluck && $event->turn_number % $luckturns == 0) {
+    if ($event->turn_number % $luckturns == 0) {
         # TODO Luckstones prevent timeing out
-        if ($luck > $baseluck) {
+        if ($luck > 0) {
             $luck--;
-        } elsif ($luck < $baseluck) {
+        } elsif ($luck < 0) {
             $luck++;
         }
-        $self->luck($luck);
+        $self->baseluck($luck);
     }
 };
 
@@ -764,7 +772,6 @@ subscribe protection_gone => sub {
 subscribe friday_13th => sub {
    my $self = shift;
    $self->is_friday_13th(1);
-   $self->luck($self->luck - 1);
 };
 
 sub has_infravision {
