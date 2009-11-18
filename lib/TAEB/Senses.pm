@@ -243,6 +243,18 @@ has is_friday_13th => (
     default => 0,
 );
 
+has is_new_moon => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
+
+has is_full_moon => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
+
 sub parse_botl {
     my $self = shift;
     my $status = TAEB->vt->row_plaintext(22);
@@ -425,7 +437,7 @@ sub luck {
     my $self = shift;
     my $luck = $self->baseluck;
     $luck-- if $self->is_friday_13th;
-    # TODO Full moon is +1
+    $luck++ if $self->is_full_moon;
     # TODO Extra luck from luckstones
     return $luck;
 }
@@ -772,6 +784,16 @@ subscribe protection_gone => sub {
 subscribe friday_13th => sub {
    my $self = shift;
    $self->is_friday_13th(1);
+};
+
+subscribe new_moon => sub {
+   my $self = shift;
+   $self->is_new_moon(1);
+};
+
+subscribe full_moon => sub {
+   my $self = shift;
+   $self->is_full_moon(1);
 };
 
 sub has_infravision {

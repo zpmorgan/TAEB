@@ -425,6 +425,8 @@ sub handle_logging_in {
         $self->new_game($1 ? 0 : 1);
         # XXX Reset here since it shouldn't really be persisted
         $self->senses->is_friday_13th(0);
+        $self->senses->is_new_moon(0);
+        $self->senses->is_full_moon(0);
         $self->write(' ') if $self->vt->contains("--More--");
         $self->state('playing');
         $self->paused(1) if $self->config->contents->{start_paused};
