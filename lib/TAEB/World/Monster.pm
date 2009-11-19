@@ -399,7 +399,7 @@ sub average_actions_to_kill {
     return if !$potential;
     # Hit dice are d8s, so average 4.5 sides each.
     my $hd = (max map { $_->hitdice } $self->possibilities);
-    return if !$hd;
+    return 2.5 / $potential if !$hd;
     return $hd * 4.5 / $potential;
 }
 
