@@ -542,7 +542,7 @@ sub keypress {
     if ($c eq 'I') {
         my $menu = TAEB::Display::Menu->new(
             description => "Item spoiler data",
-            items       => [ NetHack::Item::Spoiler->all_identities ],
+            items       => [ sort NetHack::Item::Spoiler->all_identities ],
             select_type => 'single',
         );
         my $item = $self->display_menu($menu)
@@ -557,7 +557,7 @@ sub keypress {
     if ($c eq 'M') {
         my $menu = TAEB::Display::Menu->new(
             description => "Monster spoiler data",
-            items       => [ map { $_->name }
+            items       => [ sort map { $_->name }
                              NetHack::Monster::Spoiler->list ],
             select_type => 'single',
         );
