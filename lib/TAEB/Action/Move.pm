@@ -156,7 +156,7 @@ sub handle_obscured_doors {
     my $dy   = shift;
 
     # can't move? then don't bother
-    return unless TAEB->can_move;
+    return if TAEB::Action::Move->is_impossible;
 
     # obscured doors only affect us when we move diagonally
     return unless $dx && $dy;
