@@ -47,6 +47,7 @@ sub name {
 }
 
 sub is_impossible { 0 }
+sub is_advisable  { 1 }
 
 use Module::Pluggable
     search_path => 'TAEB::Action',
@@ -98,6 +99,11 @@ Returns the name of this action object.
 =head2 is_impossible
 
 Returns whether the action is possible to perform this step or not.
+
+=head2 is_advisable
+
+Returns whether the action is likely to have the desired results or not. For
+example, engraving while blind is not advisable.
 
 =head2 action_names
 
