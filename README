@@ -46,7 +46,9 @@ Or you can get a tarball from
 "http://github.com/sartak/TAEB-AI-Behavioral/tarball/master" or the CPAN.
 
 The newer actively developed AI is Planar, whose design principle is "be the
-opposite of Behavorial". You can get it from ...
+opposite of Behavorial". You can get it from darcs:
+
+    darcs get http://ais523.sartak.org/TAEB-AI-Planar
 
 -- CONFIGURATION
 
