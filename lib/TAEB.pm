@@ -515,7 +515,7 @@ sub keypress {
     if ($c eq "\cP") {
         my $menu = TAEB::Display::Menu->new(
             description => "Old messages",
-            items       => [ $self->scraper->old_messages ],
+            items       => [ reverse $self->scraper->old_messages ],
         );
         $self->display_menu($menu);
 
