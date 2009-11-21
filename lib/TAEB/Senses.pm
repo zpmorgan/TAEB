@@ -450,46 +450,6 @@ sub can_pray {
         && $self->luck >= 0
 }
 
-sub can_engrave {
-    my $self = shift;
-    return not $self->is_polymorphed
-            || $self->is_blind
-            || $self->is_confused
-            || $self->is_stunned
-            || $self->is_hallucinating
-            || $self->is_engulfed
-            || !TAEB->current_tile->is_engravable;
-}
-
-sub can_open {
-    my $self = shift;
-    return not $self->is_polymorphed
-            || $self->in_pit;
-}
-
-sub can_kick {
-    my $self = shift;
-    return not $self->in_beartrap
-            || $self->in_pit
-            || $self->in_web
-            || $self->is_wounded_legs
-            || $self->is_levitating;
-}
-
-sub can_pickup {
-    my $self = shift;
-    return not $self->is_levitating;
-}
-
-sub can_move {
-    my $self = shift;
-    return not $self->in_beartrap
-            || $self->in_pit
-            || $self->in_web
-            || $self->is_grabbed
-            || $self->is_engulfed;
-}
-
 sub in_pray_heal_range {
     my $self = shift;
     return $self->hp * 7 < $self->maxhp || $self->hp < 6;
