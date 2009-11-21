@@ -71,5 +71,6 @@ where you placed them.
 
 If you're sufficiently inspired by TAEB, we'd love to have you onboard! The
 best first step is to read TAEB::AI::Demo's code (which lives in
-lib/TAEB/AI/Demo.pm) then try some of the exercises.
+lib/TAEB/AI/Demo.pm) then try some of the exercises. The exercises are geared
+toward letting you explore TAEB's codebase. Very tricky, we are.
 
