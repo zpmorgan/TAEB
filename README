@@ -67,3 +67,9 @@ You should now be ready to run TAEB! Type "taeb" and cross your fingers.
 If perl doesn't find the installed modules you may need to set PERL5LIB to
 where you placed them.
 
+-- HACKING ON TAEB
+
+If you're sufficiently inspired by TAEB, we'd love to have you onboard! The
+best first step is to read TAEB::AI::Demo's code (which lives in
+lib/TAEB/AI/Demo.pm) then try some of the exercises.
+
