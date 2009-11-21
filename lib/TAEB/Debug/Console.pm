@@ -41,7 +41,9 @@ sub repl {
         # error.
         die @_;
     } elsif ($@) {
-        die $@;
+        # Otherwise, Carp::REPL just didn't load, so let the user know what's
+        # up.
+        TAEB->complain($@);
     }
 
     eval {
