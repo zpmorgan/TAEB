@@ -284,14 +284,18 @@ sub next_action {
     my $action = $self->ai->next_action(@_)
         or confess $self->ai . " did not return a next_action!";
 
-    return $action if $action->isa('TAEB::Action');
-
-    # Not an action, but can become one.
+    # Canonicalize action-like things into the action
     if ($action->does('TAEB::Role::Actionable')) {
-        return $action->as_action;
+        $action = $action->as_action;
     }
 
-    confess $self->ai . "'s next_action returned a non-action!";
+    confess $self->ai . "'s next_action returned a non-action!"
+        unless $action->isa('TAEB::Action');
+
+    confess $self->ai . " returned an action ($action) that is currently impossible!"
+        if $action->is_impossible;
+
+    return $action;
 }
 
 sub iterate {
