@@ -1,29 +1,34 @@
 package TAEB::AI::Demo;
-use TAEB::OO; # Moose but with a bit more added to it
+use TAEB::OO; # like "use Moose" but with a bit more added to it
 extends 'TAEB::AI';
 
-# The framework calls this method to determine what action to do next. An action
-# is an instance of TAEB::Action, which is basically an object wrapper around
-# a NetHack command like "s" for search.
+# The framework calls this method on the AI object to determine what action to
+# do next. An action is an instance of TAEB::Action, which is basically a handy
+# object wrapper around a NetHack command like "s" for search.
 sub next_action {
     my $self = shift;
 
+    # Try each of these behaviors (which are methods) in order...
     for my $behavior (qw/pray melee hunt descend to_stairs open_door to_door explore search/) {
         my $method = "try_$behavior";
         my $action = $self->$method
             or next;
 
+        # "currently" is for reporting what we're doing on the second-to-last
+        # line of the TAEB display. Optional but you should set it anyway.
         $self->currently($behavior);
+
         return $action;
     }
 
-    # We must be trapped! Search for a secret door.
+    # We must be trapped! Search for a secret door. This is a nice fallback
+    # since you can search indefinitely.
     $self->currently('to_search');
     return $self->to_search;
 }
 
 sub try_pray {
-    # this returns false if we prayed recently, or our god is angry, etc.
+    # This returns false if we prayed recently, or our god is angry, etc.
     return unless TAEB::Action::Pray->is_advisable
 
     # Only pray if we're low on nutrition or health.
@@ -116,8 +121,7 @@ sub find_adjacent {
         ($tile, $direction) = ($t, $d) if $code->($t, $d);
     });
 
-    return $tile if !wantarray;
-    return ($tile, $direction);
+    return wantarray ? ($tile, $direction) : $tile;
 }
 
 # if_adjacent takes a predicate and an action name. If the predicate returns
@@ -144,9 +148,11 @@ sub if_adjacent {
     my $action_class = "TAEB::Action::\u$action";
 
     # We only want to pass in a direction if the action cares about direction.
+    # Actions that care about direction do the TAEB::Action::Role::Direction
+    # "role". Kind of like a Java interface, but more awesome.
     my %args;
     $args{direction} = $direction
-        if $action_class->meta->find_attribute_by_name('direction');
+        if $action_class->does('TAEB::Action::Role::Direction');
 
     return $action_class->new(%args);
 }
