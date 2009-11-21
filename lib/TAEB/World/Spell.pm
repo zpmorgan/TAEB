@@ -101,6 +101,20 @@ sub failure_rate {
         },
     );
 
+    my %aspect = (
+        shield    => TAEB->equipment->shield,
+        cloak     => TAEB->equipment->cloak,
+        helmet    => TAEB->equipment->helmet,
+        gloves    => TAEB->equipment->gloves,
+        boots     => TAEB->equipment->boots,
+        bodyarmor => TAEB->equipment->bodyarmor,
+        int       => TAEB->senses->int,
+        wis       => TAEB->senses->wis,
+        level     => TAEB->level,
+
+        @_
+    );
+
     use integer;
 
     # start with base penalty
@@ -109,15 +123,15 @@ sub failure_rate {
     # Inventory penalty calculation
     # first the shield!
     $penalty += $penalties{TAEB->role}->{shield}
-             if defined TAEB->equipment->shield;
+             if defined $aspect{shield};
     # body armor, complicated with the robe
-    if (defined TAEB->equipment->bodyarmor) {
+    if (defined $aspect{bodyarmor}) {
         my $suit_penalty = 0;
         $suit_penalty = $penalties{TAEB->role}->{suit}
-                      if TAEB->equipment->bodyarmor->is_metallic;
+                      if $aspect{bodyarmor}->is_metallic;
         # if wearing a robe, either halve the suit penalty or negate completely 
-        if (defined TAEB->equipment->cloak
-           && TAEB->equipment->cloak->name eq 'robe') {
+        if (defined $aspect{cloak}
+           && $aspect{cloak}->name eq 'robe') {
             if ($suit_penalty > 0) {
                 $suit_penalty /= 2;
             }
@@ -128,15 +142,15 @@ sub failure_rate {
         $penalty += $suit_penalty;
     }
     # metallic helmet, except if HoB
-    $penalty += 4 if defined TAEB->equipment->helmet
-                  && TAEB->equipment->helmet->is_metallic
-                  && TAEB->equipment->helmet->name ne 'helm of brilliance';
+    $penalty += 4 if defined $aspect{helmet}
+                  && $aspect{helmet}->is_metallic
+                  && $aspect{helmet}->name ne 'helm of brilliance';
     # metallic gloves
-    $penalty += 6 if defined TAEB->equipment->gloves
-                  && TAEB->equipment->gloves->is_metallic;
+    $penalty += 6 if defined $aspect{gloves}
+                  && $aspect{gloves}->is_metallic;
     # metallic boots
-    $penalty += 2 if defined TAEB->equipment->boots
-                  && TAEB->equipment->boots->is_metallic;
+    $penalty += 2 if defined $aspect{boots}
+                  && $aspect{boots}->is_metallic;
 
     $penalty += $penalties{TAEB->role}->{emergency} if $self->emergency;
     $penalty -= 4 if ($self->role || '') eq TAEB->role;
@@ -144,8 +158,9 @@ sub failure_rate {
     my $chance;
     my $SKILL = 0; # XXX: this needs to reference skill levels
     my $statname = $penalties{TAEB->role}->{stat};
-    my $basechance = TAEB->$statname * 11 / 2;
-    my $diff = (($self->level - 1) * 4 - ($SKILL * 6 + (TAEB->level / 3) + 1));
+    my $basechance = $aspect{$statname} * 11 / 2;
+    my $diff = (($self->level - 1) * 4 -
+        ($SKILL * 6 + ($aspect{level} / 3) + 1));
     if ($diff > 0) {
         $chance = $basechance - sqrt(900 * $diff + 2000);
     }
@@ -157,9 +172,9 @@ sub failure_rate {
     $chance = max(min($chance, 120), 0);
 
     # shield and special spell
-    if (defined TAEB->equipment->shield
-       && TAEB->equipment->shield->name ne 'small shield') {
-        if ($self->role eq TAEB->role) {
+    if (defined $aspect{shield}
+       && $aspect{shield}->name ne 'small shield') {
+        if (($self->role || '') eq TAEB->role) {
             # halve chance if special spell
             $chance /= 2;
         }
