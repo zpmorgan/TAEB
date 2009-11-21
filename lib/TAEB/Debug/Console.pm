@@ -16,18 +16,6 @@ sub repl {
     $ENV{PERL_RL} ||= $self->config->{readline}
         if $self->config && exists $self->config->{readline};
 
-    TAEB->display->deinitialize;
-
-    print "\n"
-        . "\e[1;37m+"
-        . "\e[1;30m" . ('-' x 50)
-        . "\e[1;37m[ "
-        . "\e[1;36mT\e[0;36mAEB \e[1;36mC\e[0;36monsole"
-        . " \e[1;37m]"
-        . "\e[1;30m" . ('-' x 12)
-        . "\e[1;37m+"
-        . "\e[m\n";
-
     no warnings 'redefine';
     # using require doesn't call import, so no die handler is installed
     eval {
@@ -46,6 +34,18 @@ sub repl {
         TAEB->complain($@);
         return;
     }
+
+    TAEB->display->deinitialize;
+
+    print "\n"
+        . "\e[1;37m+"
+        . "\e[1;30m" . ('-' x 50)
+        . "\e[1;37m[ "
+        . "\e[1;36mT\e[0;36mAEB \e[1;36mC\e[0;36monsole"
+        . " \e[1;37m]"
+        . "\e[1;30m" . ('-' x 12)
+        . "\e[1;37m+"
+        . "\e[m\n";
 
     eval {
         local $SIG{__WARN__};
