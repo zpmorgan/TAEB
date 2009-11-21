@@ -23,8 +23,8 @@ sub next_action {
 }
 
 sub try_pray {
-    # can_pray returns false if we prayed recently, or our god is angry, etc.
-    return unless TAEB->can_pray;
+    # this returns false if we prayed recently, or our god is angry, etc.
+    return unless TAEB::Action::Pray->is_advisable
 
     # Only pray if we're low on nutrition or health.
     return unless TAEB->nutrition < 0

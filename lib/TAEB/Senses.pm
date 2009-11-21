@@ -442,14 +442,6 @@ sub luck {
     return $luck;
 }
 
-sub can_pray {
-    my $self = shift;
-
-    return $self->max_god_anger == 0
-        && TAEB->turn > $self->last_prayed + 500
-        && $self->luck >= 0
-}
-
 sub in_pray_heal_range {
     my $self = shift;
     return $self->hp * 7 < $self->maxhp || $self->hp < 6;
