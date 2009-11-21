@@ -74,3 +74,6 @@ best first step is to read TAEB::AI::Demo's code (which lives in
 lib/TAEB/AI/Demo.pm) then try some of the exercises. The exercises are geared
 toward letting you explore TAEB's codebase. Very tricky, we are.
 
+We also write a lot about TAEB's architecture and dealing with programmatic
+NetHack on our blog, http://taeb-blog.sartak.org/
+
