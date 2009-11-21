@@ -44,6 +44,7 @@ sub repl {
         # Otherwise, Carp::REPL just didn't load, so let the user know what's
         # up.
         TAEB->complain($@);
+        return;
     }
 
     eval {
