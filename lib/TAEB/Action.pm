@@ -46,6 +46,8 @@ sub name {
     return;
 }
 
+sub is_impossible { 0 }
+
 use Module::Pluggable
     search_path => 'TAEB::Action',
     require     => 1,
@@ -92,6 +94,10 @@ is typically the package name in lower case.
 =head2 name
 
 Returns the name of this action object.
+
+=head2 is_impossible
+
+Returns whether the action is possible to perform this step or not.
 
 =head2 action_names
 

@@ -31,6 +31,10 @@ sub select_pickup {
     TAEB->want_item($item);
 }
 
+sub is_impossible {
+    return TAEB->is_levitating;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -66,6 +66,12 @@ sub done {
         if $self->engraver->has_tracker;
 }
 
+sub is_impossible {
+    return TAEB->is_polymorphed
+        || TAEB->is_engulfed
+        || !TAEB->current_tile->is_engravable;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

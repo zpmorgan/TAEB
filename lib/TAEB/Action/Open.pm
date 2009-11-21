@@ -27,6 +27,11 @@ subscribe door => sub {
     }
 };
 
+sub is_impossible {
+    return TAEB->is_polymorphed
+        || TAEB->in_pit;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

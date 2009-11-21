@@ -201,6 +201,15 @@ sub location_controlled_tele {
     return $adjacent[0];
 }
 
+sub is_impossible {
+    my $self = shift;
+    return TAEB->in_beartrap
+        || TAEB->in_pit
+        || TAEB->in_web
+        || TAEB->is_grabbed
+        || TAEB->is_engulfed;
+}
+
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
 1;

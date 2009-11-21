@@ -23,6 +23,14 @@ sub done {
     $target->kicked($target->kicked + 1) if $target->can('kicked');
 }
 
+sub is_impossible {
+    return TAEB->in_beartrap
+        || TAEB->in_pit
+        || TAEB->in_web
+        || TAEB->is_wounded_legs
+        || TAEB->is_levitating;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
