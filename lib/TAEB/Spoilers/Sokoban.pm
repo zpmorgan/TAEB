@@ -322,7 +322,7 @@ sub _lists_sort_equal {
     return 1;
 }
 
-sub recognise_sokoban_variant {
+sub recognize_sokoban_variant {
     my $self = shift;
     my $level = shift;
     $level = TAEB->current_level unless defined $level;
@@ -373,7 +373,7 @@ sub recognise_sokoban_variant {
 sub remaining_pits {
     my $self = shift;
     my $level = shift || TAEB->current_level;
-    my $variant = shift || scalar $self->recognise_sokoban_variant($level);
+    my $variant = shift || scalar $self->recognize_sokoban_variant($level);
     return $self->level_maps->{$variant}->{'pitcount'} -
            $level->pit_and_hole_traps_untrapped;
 }
@@ -434,7 +434,7 @@ sub probably_has_genuine_boulder {
 sub is_sokoban_reward_tile {
     my $self = shift;
     my $tile = shift;
-    my ($variant, $left, $top) = $self->recognise_sokoban_variant($tile->level);
+    my ($variant, $left, $top) = $self->recognize_sokoban_variant($tile->level);
     my $map = $self->level_maps->{$variant}->{'map'};   
     my $y = $tile->y - $top;
     my $x = $tile->x - $left;
@@ -454,7 +454,7 @@ sub next_sokoban_step {
         return undef unless $tile_from; # can't path to Sokoban
     }
 
-    my ($variant, $left, $top) = $self->recognise_sokoban_variant($level);
+    my ($variant, $left, $top) = $self->recognize_sokoban_variant($level);
 
     if (!$variant) {
         TAEB->log->spoiler(
@@ -627,7 +627,7 @@ no MooseX::Singleton;
 
 __END__
 
-=head2 recognise_sokoban_variant [Level] -> Maybe Str [Int Int]
+=head2 recognize_sokoban_variant [Level] -> Maybe Str [Int Int]
 
 Returns the variant of Sokoban that Level is, or undef if it isn't a
 Sokoban level. This is a string giving NetHack's internal name for the
@@ -702,6 +702,6 @@ boulder).
 
 This routine does not make any assumptions about the behavior of the
 AI, and is stateless (it is based entirely on current information,
-rather than anything memorised).
+rather than anything memorized).
 
 =cut
