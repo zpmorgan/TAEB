@@ -61,7 +61,8 @@ sub update {
     my ($old_x, $old_y) = ($self->x, $self->y);
     my $old_level = $self->dungeon->current_level;
 
-    my ($Tx, $Ty) = (TAEB->vt->x, TAEB->vt->y);
+    my $vt = TAEB->vt;
+    my ($Tx, $Ty) = ($vt->x, $vt->y);
     $self->x($Tx);
     $self->y($Ty);
 
@@ -84,16 +85,21 @@ sub update {
             $tile_changed = 1;
             $level->update_tile($x, $y, $glyph, $color);
         }
-        # XXX: this should be checking for 'visual range' (taking blindness and
-        # lamps into account) - currently blindness is tested for in
-        # Tile::update
-        elsif (abs($x - $Tx) <= 1
-            && abs($y - $Ty) <= 1
-            && $tile->type eq 'unexplored') {
-            $level->update_tile($x, $y, $glyph, $color);
-        }
 
         return 1;
+    });
+
+    # XXX: should this be each_adjacent_inclusive? consider teleports etc
+    TAEB->each_adjacent(sub {
+        my $tile = shift;
+        if ($tile->type eq 'unexplored') {
+            my $x     = $tile->x;
+            my $y     = $tile->y;
+            my $glyph = $vt->at($x, $y);
+            my $color = $vt->color($x, $y);
+
+            $level->update_tile($x, $y, $glyph, $color);
+        }
     });
 
     $old_level->step_off($old_x, $old_y) if defined($old_x);
