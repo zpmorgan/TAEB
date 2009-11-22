@@ -203,11 +203,12 @@ sub location_controlled_tele {
 
 sub is_impossible {
     my $self = shift;
-    return TAEB->in_beartrap
-        || TAEB->in_pit
-        || TAEB->in_web
-        || TAEB->is_grabbed
-        || TAEB->is_engulfed;
+
+    # This used to check the following conditions as well, but we *can* usefully
+    # move in such cases - to escape our being stuck
+#   TAEB->in_beartrap || TAEB->in_pit || TAEB->in_web || TAEB->is_grabbed
+
+    return TAEB->is_engulfed;
 }
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
