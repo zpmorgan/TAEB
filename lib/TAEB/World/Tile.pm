@@ -126,19 +126,44 @@ has monster => (
     predicate => 'has_monster',
 );
 
-has items => (
-    traits     => ['Array'],
-    is         => 'ro',
-    isa        => 'ArrayRef[NetHack::Item]',
-    default    => sub { [] },
-    auto_deref => 1,
-    handles    => {
-        add_item    => 'push',
-        clear_items => 'clear',
-        remove_item => 'delete',
-        item_count  => 'count',
-    },
+has _items => (
+    is      => 'rw',
+    isa     => 'ArrayRef[NetHack::Item]',
+    clearer => 'clear_items',
 );
+
+sub items {
+    my $self = shift;
+    my $items = $self->_items;
+    return $items ? @$items : ();
+}
+
+sub item_count {
+    my $self = shift;
+    my $items = $self->_items;
+    return $items ? scalar @$items : 0;
+}
+
+sub add_item {
+    my $self = shift;
+
+    return $self->_items([@_])
+        if !$self->_items;
+
+    for (@_) {
+        $_->isa('NetHack::Item')
+            or confess "add_item called with non-item $_";
+    }
+
+    push @{ $self->_items }, @_;
+}
+
+sub remove_item {
+    my $self = shift;
+    my $idx  = shift;
+
+    splice @{ $self->_items || [] }, $idx, 1;
+}
 
 has last_step => (
     is            => 'rw',
