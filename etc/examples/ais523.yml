@@ -9,8 +9,9 @@ ai_options:
     Planar:
         overall_plan: DevNullSokobanMeta
 
-interface: Local
+#interface: Local
 #interface: Telnet
+interface: SSH
 
 display: Curses
 
@@ -19,7 +20,7 @@ interface_options:
         args:
           - -u
           - TAEB
-# config for Telnet's in secret_config
+# config for SSH and Telnet are in secret_config
 
 character:
     role: 'v'
@@ -40,7 +41,7 @@ debug:
     console:
         readline: Gnu
 
-kiosk_mode: 0
+kiosk_mode: 1
 
 other_config:
     - ~/.taeb/secret_config.yml
