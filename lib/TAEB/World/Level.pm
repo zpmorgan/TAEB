@@ -423,7 +423,8 @@ sub iterate_tile_vt {
 
         for my $x (0 .. 79) {
             return unless $code->(
-                $self->at($x, $y),
+                # XXX: yes, this is another encapsulation breaker. boo hoo!
+                $self->{tiles}->[$y][$x],
                 $glyphs[$x],
                 $colors[$x],
                 $x,
