@@ -426,6 +426,20 @@ sub probably_has_genuine_boulder {
     my $self = shift;
     my $tile = shift;
     return 0 unless $tile->has_boulder;
+    if ($tile->level->pit_and_hole_traps_untrapped == 0 &&
+        $tile->type eq 'obscured') {
+        my ($variant, $left, $top) =
+            $self->recognize_sokoban_variant($tile->level);
+        if ($variant) {
+            my $map = $self->level_maps->{$variant}->{'map'};
+            my $y = $tile->y - $top;
+            my $x = $tile->x - $left;
+            if ($map->[$y]->[$x] =~ /[0-9!"\$\%\&'~:]/) {
+                # inject info into the map
+                $tile->change_type(trap => '^');
+            }
+        }
+    }
     return 1 if $tile->type eq 'obscured' || $tile->type eq 'rock';
     return 1 if $tile->known_genuine_boulder;
     return 0; # probably a mimic
@@ -435,7 +449,8 @@ sub is_sokoban_reward_tile {
     my $self = shift;
     my $tile = shift;
     my ($variant, $left, $top) = $self->recognize_sokoban_variant($tile->level);
-    my $map = $self->level_maps->{$variant}->{'map'};   
+    return 0 unless $variant;
+    my $map = $self->level_maps->{$variant}->{'map'};
     my $y = $tile->y - $top;
     my $x = $tile->x - $left;
     return $map->[$y]->[$x] == '*';
@@ -670,7 +685,10 @@ is a genuine boulder, rather than a mimic pretending. To be precise,
 this returns true if we've pushed a boulder onto the square and
 haven't pushed it off again, or if the tile is obscured and appears to
 have a boulder; this handles all cases but that of a mimic visible
-when we arrive on the level, and a search should detect that.
+when we arrive on the level, and a search should detect that. This
+routine will also mark pits on the map where they exist underneath
+boulder-mimics, in order to be able to detect the mimics, if no pits
+or traps have been closed on the level.
 
 =head2 is_sokoban_reward_tile Tile -> Bool
 
