@@ -92,7 +92,8 @@ augment read => sub {
         $self->sent_login(1);
 
         # We want to play the first game (for multi-game dgamelaunch)
-        $self->write('1');
+        # Not needed on NAO anymore
+        #$self->write('1');
 
         $self->send_options;
 
