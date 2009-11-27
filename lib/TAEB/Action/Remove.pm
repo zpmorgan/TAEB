@@ -19,7 +19,11 @@ sub respond_remove_what { shift->item->slot }
 
 sub done { shift->item->is_worn(0) }
 
-sub msg_cursed { shift->item->buc('cursed') }
+sub msg_cursed {
+    my $self = shift;
+    $self->item->buc('cursed');
+    $self->aborted(1);
+}
 
 __PACKAGE__->meta->make_immutable;
 
