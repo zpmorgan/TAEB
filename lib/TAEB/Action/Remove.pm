@@ -17,7 +17,11 @@ sub command {
 
 sub respond_remove_what { shift->item->slot }
 
-sub done { shift->item->is_worn(0) }
+sub done {
+    my $self = shift;
+    $self->item->is_worn(0);
+    $self->item->is_cursed(0);
+}
 
 sub msg_cursed {
     my $self = shift;
