@@ -843,6 +843,8 @@ our @exceptions = (
     # up items from an escaped-from pit, the other two are for saddling
     # and picking up items while levitating
     qr/^You can(?:no|')t reach the (?!bottom)/  => 'impeded_by_levitation',
+    qr/^Not wearing any armor/                  => 'not_wearing',
+    qr/^You are not wearing that/               => 'not_wearing',
 );
 
 our @location_requests = (
