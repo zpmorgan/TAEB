@@ -31,7 +31,7 @@ subscribe now_wielding => sub {
 
     $self->weapon->is_wielded(0) if $self->weapon;
     $self->weapon($item);
-    $item->cursed(1) if $event->welded;
+    $item->is_cursed(1) if $event->welded;
     $item->is_wielded(1);
     TAEB->inventory->update($item->slot => $item);
 };
