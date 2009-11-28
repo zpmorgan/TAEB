@@ -346,6 +346,9 @@ sub msg_remove_floor_item {
     my $item = shift;
     my $tile = shift || TAEB->current_tile;
 
+    # We teleported and the tile was cleared by the map update
+    return if ($tile != TAEB->current_tile && !$tile->item_count);
+
     for my $i (0 .. $tile->item_count - 1) {
         my $tile_item = $tile->items->[$i];
 
