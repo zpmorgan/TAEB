@@ -9,9 +9,9 @@ ai_options:
     Planar:
         overall_plan: DevNullSokobanMeta
 
-#interface: Local
+interface: Local
 #interface: Telnet
-interface: SSH
+#interface: SSH
 
 display: Curses
 
