@@ -73,13 +73,18 @@ sub update {
     my $level = $self->dungeon->current_level;
 
     my $tile_changed = 0;
+    my $rogue = $level->is_rogue;
 
     $level->iterate_tile_vt(sub {
         my ($tile, $glyph, $color, $x, $y) = @_;
 
         $tile->_clear_monster if $tile->has_monster;
+        # To save time, don't look for monsters in blank space, except
+        # on the Rogue level. Likewise, . and # do not represent monsters.
         $tile->try_monster($glyph, $color)
-            unless $Tx == $x && $Ty == $y;
+            unless $glyph eq ' ' && !$rogue
+                or $glyph eq '.' || $glyph eq '#'
+                or $Tx == $x && $Ty == $y;
 
         if ($glyph ne $tile->glyph || $color != $tile->color) {
             $tile_changed = 1;
