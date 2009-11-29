@@ -1346,13 +1346,6 @@ sub handle_game_end {
         TAEB->death_state('inventory');
         _recurse;
     }
-    elsif (TAEB->topline =~ /^You die\.\.\./) {
-        TAEB->state('dying');
-        TAEB->write(' ');
-        TAEB->log->scraper("Oh no! We died! With no items!");
-        TAEB->death_state('attributes');
-        _recurse;
-    }
 
     if (TAEB->topline =~ /^Really save\?/) {
         TAEB->log->scraper("Trying to do a clean save-and-exit shutdown...");
