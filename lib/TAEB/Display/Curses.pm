@@ -309,7 +309,6 @@ sub display_topline {
 
     while (my @msgs = splice @messages, 0, 20) {
         my $y = 0;
-        $self->requires_redraw(1);
         for (@msgs) {
             my ($line, $matched) = @$_;
 
@@ -332,6 +331,7 @@ sub display_topline {
         }
 
         if (@msgs > 1) {
+            $self->requires_redraw(1);
             $self->place_cursor;
             TAEB->redraw if @messages;
         }
