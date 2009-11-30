@@ -39,6 +39,12 @@ has initialized => (
     isa => 'Bool',
 );
 
+has requires_redraw => (
+    is  => 'rw',
+    isa => 'Bool',
+    default => 1,
+);
+
 sub institute {
     shift->initialized(1);
 
@@ -97,6 +103,7 @@ sub notify {
     # using TAEB->x and TAEB->y here could screw up horrifically if the dungeon
     # object isn't loaded yet, and loading it calls notify..
     $self->place_cursor(TAEB->vt->x, TAEB->vt->y);
+    $self->requires_redraw(1);
 
     return if $sleep == 0;
 
@@ -107,6 +114,9 @@ sub notify {
 my %standard_modes;
 my ($drawn_cursorx, $drawn_cursory) = (0,0);
 
+# Not per-object, as there's only one screen to draw on
+our $last_level_redrawn = undef;
+
 sub redraw {
     my $self = shift;
     my %args = @_;
@@ -114,7 +124,9 @@ sub redraw {
     if ($args{force_clear}) {
         Curses::clear;
         Curses::refresh;
+        $self->requires_redraw(1);
     }
+    $last_level_redrawn = undef if $self->requires_redraw;
 
     my $level  = $args{level} || TAEB->current_level;
 
@@ -126,15 +138,33 @@ sub redraw {
     my $glyph_fun = $glyph_mode->{glyph} || sub { $_[0]->normal_glyph };
     my $color_fun = $color_mode->{color} || sub { $_[0]->normal_color };
 
+    my $bbox_only = $color_mode->{bounding_box_only}
+                 && $glyph_mode->{bounding_box_only}
+                 && $last_level_redrawn
+                 && $last_level_redrawn == $level;
+    $last_level_redrawn = $level;
+    my ($bb_l, $bb_r, $bb_t, $bb_b) = (0, 79, 1, 21);
+    my $cartographer = TAEB->dungeon->cartographer;
+    if ($bbox_only && $bb_t >= 1) {
+        $bb_l = $cartographer->tilechange_l
+            if defined $cartographer->tilechange_l;
+        $bb_r = $cartographer->tilechange_r
+            if defined $cartographer->tilechange_r;
+        $bb_t = $cartographer->tilechange_t
+            if defined $cartographer->tilechange_t;
+        $bb_b = $cartographer->tilechange_b
+            if defined $cartographer->tilechange_b;
+    }
+
     $color_mode->{onframe}() if $color_mode->{onframe};
     $glyph_mode->{onframe}() if $glyph_mode->{onframe} &&
         $color_mode != $glyph_mode;
 
     my $curses_color;
     my $lastcolorra = 0;
-    for my $y (1 .. 21) {
-        Curses::move($y, 0);
-        for my $x (0 .. 79) {
+    for my $y ($bb_t .. $bb_b) {
+        Curses::move($y, $bb_l);
+        for my $x ($bb_l .. $bb_r) {
             my $tile = $level->at($x, $y);
             my $color = $color_fun->($tile);
             my $glyph = $glyph_fun->($tile);
@@ -150,12 +180,14 @@ sub redraw {
 
             Curses::addch($curses_color | ord($glyph));
         }
+        Curses::clrtoeol if $self->requires_redraw;
     }
 
     ($drawn_cursorx, $drawn_cursory) = (TAEB->x, TAEB->y);
 
     $self->draw_botl($args{botl}, $args{status});
     $self->place_cursor;
+    $self->requires_redraw(0);
 }
 
 sub draw_botl {
@@ -277,6 +309,7 @@ sub display_topline {
 
     while (my @msgs = splice @messages, 0, 20) {
         my $y = 0;
+        $self->requires_redraw(1);
         for (@msgs) {
             my ($line, $matched) = @$_;
 
@@ -450,27 +483,34 @@ sub draw_menu {
 
 %standard_modes = (
     normal =>    { description => 'Normal NetHack colors',
-                   color => sub { shift->normal_color } },
+                   color => sub { shift->normal_color },
+                   bounding_box_only => 1,},
     debug  =>    { description => 'Debug coloring',
                    color => sub { shift->debug_color } },
     engraving => { description => 'Engraving coloring',
-                   color => sub { shift->engraving_color } },
+                   color => sub { shift->engraving_color },
+                   bounding_box_only => 1,},
     stepped =>   { description => 'Stepped-on coloring',
-                   color => sub { shift->stepped_color } },
+                   color => sub { shift->stepped_color },
+                   bounding_box_only => 1,},
     time =>      { description => 'Time-since-stepped coloring',
-                   color => sub { shift->time_color } },
+                   color => sub { shift->time_color },
+                   bounding_box_only => 1,},
     lit =>       { description => 'Highlight lit tiles',
                    color => sub { shift->lit_color } },
     los =>       { description => 'Highlight line-of-sight',
                    color => sub { shift->los_color } },
     floor =>     { description => 'Hide objects and monsters',
-                   glyph => sub { shift->floor_glyph } },
+                   glyph => sub { shift->floor_glyph },
+                   bounding_box_only => 1,},
     terrain =>   { description => 'Display terrain knowledge',
                    glyph => sub { tile_type_to_glyph(shift->type) },
-                   color => sub { display(tile_type_to_color(shift->type)) } },
+                   color => sub { display(tile_type_to_color(shift->type)) },
+                   bounding_box_only => 1,},
     item =>      { description => 'Hide monsters',
                    glyph => sub { shift->itemly_glyph },
-                   color => sub { shift->item_display_color } },
+                   color => sub { shift->item_display_color },
+                   bounding_box_only => 1,},
     reset =>     { description => 'Reset to configured settings',
                    immediate => sub {
                        my $self = shift;
