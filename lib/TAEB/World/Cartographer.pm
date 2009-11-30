@@ -130,8 +130,13 @@ sub update {
     $old_level->step_off($old_x, $old_y) if defined($old_x);
     $level->step_on($self->x, $self->y);
 
+    $self->tilechange_l($tc_l);
+    $self->tilechange_r($tc_r);
+    $self->tilechange_t($tc_t);
+    $self->tilechange_b($tc_b);
+
     if ($tile_changed) {
-        $self->autoexplore;
+        $self->autoexplore($level == $old_level);
         $self->dungeon->current_level->detect_branch;
         TAEB->send_message('tile_changes');
     }
@@ -139,11 +144,6 @@ sub update {
     if ($tile_changed || $self->x != $old_x || $self->y != $old_y) {
         $self->invalidate_fov;
     }
-
-    $self->tilechange_l($tc_l);
-    $self->tilechange_r($tc_r);
-    $self->tilechange_t($tc_t);
-    $self->tilechange_b($tc_b);
 }
 
 sub map_like {
@@ -224,9 +224,24 @@ sub check_dlvl {
 sub autoexplore {
     my $self = shift;
     my $level = $self->dungeon->current_level;
+    my $can_optimise = shift || 0;
 
-    for my $y (1 .. 21) {
-        TILE: for my $x (0 .. 79) {
+    my ($t, $b, $l, $r) = (1, 21, 0, 79);
+    if ($can_optimise) {
+        $t = $self->tilechange_t if defined $self->tilechange_t;
+        $b = $self->tilechange_b if defined $self->tilechange_b;
+        $l = $self->tilechange_l if defined $self->tilechange_l;
+        $r = $self->tilechange_r if defined $self->tilechange_r;
+    }
+
+    # Updating a tile can cause autoexploration of tiles next to it.
+    $t-- if $t > 1;
+    $b++ if $b < 21;
+    $l-- if $l > 0;
+    $r++ if $r < 79;
+
+    for my $y ($t .. $b) {
+        TILE: for my $x ($l .. $r) {
             my $tile = $level->at($x, $y);
 
             if (!$tile->explored
