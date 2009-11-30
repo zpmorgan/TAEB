@@ -416,8 +416,10 @@ sub iterate_tile_vt {
     my $self = shift;
     my $code = shift;
     my $vt   = shift || TAEB->vt;
+    my $skip_unchanged = shift || 0;
 
     for my $y (1 .. 21) {
+        next if $skip_unchanged && !($vt->rows_changed->[$y]);
         my @glyphs = split '', $vt->row_plaintext($y);
         my @colors = $vt->row_color($y);
 
@@ -432,6 +434,7 @@ sub iterate_tile_vt {
             );
         }
     }
+    $vt->rows_changed([]) if $skip_unchanged;
 
     return 1;
 }

@@ -112,7 +112,7 @@ sub update {
         }
 
         return 1;
-    });
+    }, TAEB->vt, 1);
 
     # XXX: should this be each_adjacent_inclusive? consider teleports etc
     TAEB->each_adjacent(sub {
