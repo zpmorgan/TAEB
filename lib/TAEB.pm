@@ -302,8 +302,6 @@ sub iterate {
     my $self = shift;
 
     eval {
-        $self->redraw;
-        $self->display_topline;
         $self->human_input;
 
         unless ($self->paused) {
@@ -311,8 +309,14 @@ sub iterate {
 
             $self->full_input(1);
 
+            $self->redraw;
+            $self->display_topline;
+
             my $method = "handle_" . $self->state;
             $self->$method;
+        } else {
+            $self->redraw;
+            $self->display_topline;
         }
     };
 
