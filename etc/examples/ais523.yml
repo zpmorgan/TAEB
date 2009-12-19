@@ -41,7 +41,7 @@ debug:
     console:
         readline: Gnu
 
-kiosk_mode: 1
+kiosk_mode: 0
 
 other_config:
     - ~/.taeb/secret_config.yml
