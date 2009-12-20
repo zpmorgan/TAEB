@@ -688,6 +688,31 @@ sub each_tile {
         }
     }
 }
+# Iterates over a bounding rectangle containing all tiles whose
+# visible glyphs have changed this step, and their neighbors.
+sub each_changed_tile_and_neighbors {
+    my $self = shift;
+    my $code = shift;
+    my $cartographer = TAEB->dungeon->cartographer;
+
+    my ($t, $b, $l, $r);
+    $t = $cartographer->tilechange_t || 1;
+    $b = $cartographer->tilechange_b || 21;
+    $l = $cartographer->tilechange_l || 0;
+    $r = $cartographer->tilechange_r || 79;
+
+    $t-- if $t > 1;
+    $b++ if $b < 21;
+    $l-- if $l > 0;
+    $r++ if $r < 79;
+
+    for my $y ($t..$b) {
+        for my $x ($l..$r) {
+            $code->($self->at($x, $y));
+        }
+    }
+}
+
 
 sub msg_dungeon_level {
     my $self = shift;

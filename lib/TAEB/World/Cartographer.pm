@@ -225,34 +225,19 @@ sub autoexplore {
     my $self = shift;
     my $level = $self->dungeon->current_level;
     my $can_optimise = shift || 0;
+    my $iterator = $can_optimise ? 'each_changed_tile_and_neighbors'
+                                 : 'each_tile';
 
-    my ($t, $b, $l, $r) = (1, 21, 0, 79);
-    if ($can_optimise) {
-        $t = $self->tilechange_t if defined $self->tilechange_t;
-        $b = $self->tilechange_b if defined $self->tilechange_b;
-        $l = $self->tilechange_l if defined $self->tilechange_l;
-        $r = $self->tilechange_r if defined $self->tilechange_r;
-    }
-
-    # Updating a tile can cause autoexploration of tiles next to it.
-    $t-- if $t > 1;
-    $b++ if $b < 21;
-    $l-- if $l > 0;
-    $r++ if $r < 79;
-
-    for my $y ($t .. $b) {
-        TILE: for my $x ($l .. $r) {
-            my $tile = $level->at($x, $y);
-
-            if (!$tile->explored
-             && $tile->type ne 'rock'
-             && $tile->type ne 'unexplored') {
-                $tile->explored(1) unless $tile->any_adjacent(sub {
-                    shift->type eq 'unexplored'
-                });
-            }
+    $level->$iterator(sub {
+        my $tile = shift;
+        if (!$tile->explored
+            && $tile->type ne 'rock'
+            && $tile->type ne 'unexplored') {
+            $tile->explored(1) unless $tile->any_adjacent(sub {
+                shift->type eq 'unexplored'
+            });
         }
-    }
+    });
 }
 
 sub msg_dungeon_feature {
