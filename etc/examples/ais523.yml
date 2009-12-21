@@ -20,6 +20,10 @@ interface_options:
         args:
           - -u
           - TAEB
+    OldLocal:
+        args:
+          - -u
+          - OldTAEB
 # config for SSH and Telnet are in secret_config
 
 character:
