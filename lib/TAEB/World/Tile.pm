@@ -238,6 +238,7 @@ sub update {
     my $newglyph    = shift;
     my $color       = shift;
     my $oldtype     = $self->type;
+    my $oldglyph    = $self->glyph;
 
     # gas spore explosions should not update the map
     # XXX what's this for?  we don't run the AI until we've seen all
@@ -251,6 +252,10 @@ sub update {
     $self->update_lit;
 
     $self->invalidate_intrinsic_cost_cache;
+
+    # boulder messages
+    TAEB->announce('boulder_change', 'tile' => $self)
+        if $oldglyph eq '0' xor $newglyph eq '0';
 
     # dark rooms
     return if $self->glyph eq ' ' && $self->floor_glyph eq '.';
