@@ -1,5 +1,6 @@
 package TAEB::Spoilers::Sokoban;
 use MooseX::Singleton;
+use Tie::RefHash;
 
 has level_maps => (
     is => 'ro',
@@ -322,10 +323,25 @@ sub _lists_sort_equal {
     return 1;
 }
 
+# This is rather slow, but luckily memoizing the results is entirely
+# possible, due to Sokoban-ness of a level never changing. Memoization
+# here is rolled by hand due to Memoize wanting to store arguments
+# as strings.
+has _recognition_cache => (
+    isa     => 'HashRef[Maybe[ArrayRef]]',
+    is      => 'rw',
+    default => sub { my %h = (); tie %h, 'Tie::RefHash'; \%h }, 
+);
 sub recognize_sokoban_variant {
     my $self = shift;
     my $level = shift;
     $level = TAEB->current_level unless defined $level;
+
+    my $cache = $self->_recognition_cache->{$level};
+    if ($cache) {
+        return $cache->[0] unless wantarray;
+        return @$cache;
+    }
 
     my $left = 99;
     my $top = 99;
@@ -366,6 +382,7 @@ sub recognize_sokoban_variant {
         $variant = $variant_check;
         last;
     }
+    $self->_recognition_cache->{$level} = [$variant, $left, $top];
     return ($variant, $left, $top) if wantarray;
     return $variant;
 }
