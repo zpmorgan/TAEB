@@ -50,7 +50,8 @@ requires 'NetHack::FOV'  => 0.01;
 requires 'NetHack::Item' => 0.09;
 requires 'NetHack::Monster::Spoiler' => 0.02;
 
-if (!can_run('nethack')) {
+my $has_nethack = can_run('nethack');
+if (!$has_nethack) {
     warn << '__NETHACK__';
 ******************************************************************
 It appears that you do not have a "nethack" binary available. You will not be
@@ -68,11 +69,11 @@ __NETHACK__
 features(
     # optional modules that enhance TAEB's playing
     'TAEB for server NetHack' => [
-        -default => 0,
+        -default => !$has_nethack,
         recommends('IO::Socket::Telnet::HalfDuplex'),
     ],
     'TAEB for local NetHack' => [
-        -default => 0,
+        -default => $has_nethack,
         recommends('IO::Pty::HalfDuplex'),
     ],
     'Legacy interface for TAEB on local NetHack' => [
@@ -82,7 +83,7 @@ features(
 
     # debugging tools
     'REPL on ~' => [
-        -default => 1,
+        -default => 0,
         recommends('Carp::REPL'),
     ],
     'IRC debug interface' => [
