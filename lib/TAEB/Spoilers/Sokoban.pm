@@ -474,7 +474,7 @@ sub is_sokoban_reward_tile {
     my $map = $self->level_maps->{$variant}->{'map'};
     my $y = $tile->y - $top;
     my $x = $tile->x - $left;
-    return $map->[$y]->[$x] == '*';
+    return $map->[$y]->[$x] eq '*';
 }
 
 sub next_sokoban_step {
