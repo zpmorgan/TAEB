@@ -443,18 +443,22 @@ sub probably_has_genuine_boulder {
     my $self = shift;
     my $tile = shift;
     return 0 unless $tile->has_boulder;
-    if ($tile->level->pit_and_hole_traps_untrapped == 0 &&
-        $tile->type eq 'obscured') {
+    if ($tile->type eq 'obscured') {
         my ($variant, $left, $top) =
             $self->recognize_sokoban_variant($tile->level);
         if ($variant) {
             my $map = $self->level_maps->{$variant}->{'map'};
             my $y = $tile->y - $top;
             my $x = $tile->x - $left;
-            if ($map->[$y]->[$x] =~ /[0-9!"\$\%\&'~:]/) {
+            if ($tile->level->pit_and_hole_traps_untrapped == 0 &&
+                $map->[$y]->[$x] =~ /[0-9!"\$\%\&'~:]/) {
                 # inject info into the map
                 $tile->change_type(trap => '^');
             }
+            # The tile might be obscured due to having had a door there that's
+            # now been opened; however, it makes no sense to have a boulder on
+            # a door, in Sokoban.
+            return 0 if $map->[$y]->[$x] eq '+';
         }
     }
     return 1 if $tile->type eq 'obscured' || $tile->type eq 'rock';
