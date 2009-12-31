@@ -8,7 +8,7 @@ display_options:
 
 kiosk_mode: 0
 
-interface: Telnet
+interface: Local
 interface_options:
     Telnet:
         account: TAEB
