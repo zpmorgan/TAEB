@@ -14,11 +14,9 @@ interface_options:
         account: TAEB
     SSH:
         account: taeb
-    Local:
-        args: ['-D']
+    Local: {}
     OldLocal:
         read_iterations: 2
-        args: ['-D']
 
 character:
     role: Valkyrie
