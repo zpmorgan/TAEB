@@ -1,5 +1,6 @@
 package TAEB::Spoilers::Sokoban;
 use MooseX::Singleton;
+use Tie::RefHash;
 
 has level_maps => (
     is => 'ro',
@@ -322,10 +323,25 @@ sub _lists_sort_equal {
     return 1;
 }
 
+# This is rather slow, but luckily memoizing the results is entirely
+# possible, due to Sokoban-ness of a level never changing. Memoization
+# here is rolled by hand due to Memoize wanting to store arguments
+# as strings.
+has _recognition_cache => (
+    isa     => 'HashRef[Maybe[ArrayRef]]',
+    is      => 'rw',
+    default => sub { my %h = (); tie %h, 'Tie::RefHash'; \%h }, 
+);
 sub recognize_sokoban_variant {
     my $self = shift;
     my $level = shift;
     $level = TAEB->current_level unless defined $level;
+
+    my $cache = $self->_recognition_cache->{$level};
+    if ($cache) {
+        return $cache->[0] unless wantarray;
+        return @$cache;
+    }
 
     my $left = 99;
     my $top = 99;
@@ -366,6 +382,7 @@ sub recognize_sokoban_variant {
         $variant = $variant_check;
         last;
     }
+    $self->_recognition_cache->{$level} = [$variant, $left, $top];
     return ($variant, $left, $top) if wantarray;
     return $variant;
 }
@@ -426,18 +443,22 @@ sub probably_has_genuine_boulder {
     my $self = shift;
     my $tile = shift;
     return 0 unless $tile->has_boulder;
-    if ($tile->level->pit_and_hole_traps_untrapped == 0 &&
-        $tile->type eq 'obscured') {
+    if ($tile->type eq 'obscured') {
         my ($variant, $left, $top) =
             $self->recognize_sokoban_variant($tile->level);
         if ($variant) {
             my $map = $self->level_maps->{$variant}->{'map'};
             my $y = $tile->y - $top;
             my $x = $tile->x - $left;
-            if ($map->[$y]->[$x] =~ /[0-9!"\$\%\&'~:]/) {
+            if ($tile->level->pit_and_hole_traps_untrapped == 0 &&
+                $map->[$y]->[$x] =~ /[0-9!"\$\%\&'~:]/) {
                 # inject info into the map
                 $tile->change_type(trap => '^');
             }
+            # The tile might be obscured due to having had a door there that's
+            # now been opened; however, it makes no sense to have a boulder on
+            # a door, in Sokoban.
+            return 0 if $map->[$y]->[$x] eq '+';
         }
     }
     return 1 if $tile->type eq 'obscured' || $tile->type eq 'rock';
@@ -453,7 +474,7 @@ sub is_sokoban_reward_tile {
     my $map = $self->level_maps->{$variant}->{'map'};
     my $y = $tile->y - $top;
     my $x = $tile->x - $left;
-    return $map->[$y]->[$x] == '*';
+    return $map->[$y]->[$x] eq '*';
 }
 
 sub next_sokoban_step {

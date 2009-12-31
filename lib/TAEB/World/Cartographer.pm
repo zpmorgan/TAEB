@@ -20,6 +20,14 @@ has y => (
     isa => 'Int',
 );
 
+# Bounding box for tiles that have changed this step, to speed up
+# updates of the screen in situations where we know things outside
+# the bounding box won't change.
+has [qw/tilechange_l tilechange_r tilechange_t tilechange_b/] => (
+    is => 'rw',
+    isa => 'Int',
+);
+
 has fov => (
     isa       => 'ArrayRef',
     is        => 'ro',
@@ -66,6 +74,14 @@ sub update {
     $self->x($Tx);
     $self->y($Ty);
 
+    my ($tc_l, $tc_r, $tc_t, $tc_b) = ($Tx,$Tx,$Ty,$Ty);
+    if (defined $old_x && defined $old_y) {
+        $tc_l = $old_x if $old_x < $tc_l && $old_x >= 0;
+        $tc_r = $old_x if $old_x > $tc_r && $old_x <= 79;
+        $tc_t = $old_y if $old_y < $tc_t && $old_y >= 1;
+        $tc_b = $old_y if $old_y > $tc_b && $old_y <= 21;
+    }
+
     return if $self->is_engulfed;
 
     return unless $self->check_dlvl;
@@ -73,21 +89,30 @@ sub update {
     my $level = $self->dungeon->current_level;
 
     my $tile_changed = 0;
+    my $rogue = $level->is_rogue;
 
     $level->iterate_tile_vt(sub {
         my ($tile, $glyph, $color, $x, $y) = @_;
 
         $tile->_clear_monster if $tile->has_monster;
+        # To save time, don't look for monsters in blank space, except
+        # on the Rogue level. Likewise, . and # do not represent monsters.
         $tile->try_monster($glyph, $color)
-            unless $Tx == $x && $Ty == $y;
+            unless $glyph eq ' ' && !$rogue
+                or $glyph eq '.' || $glyph eq '#'
+                or $Tx == $x && $Ty == $y;
 
         if ($glyph ne $tile->glyph || $color != $tile->color) {
             $tile_changed = 1;
+            $tc_l = $x if $x < $tc_l && $x >= 0;
+            $tc_r = $x if $x > $tc_r && $x <= 79;
+            $tc_t = $y if $y < $tc_t && $y >= 1;
+            $tc_b = $y if $y > $tc_b && $y <= 21;
             $level->update_tile($x, $y, $glyph, $color);
         }
 
         return 1;
-    });
+    }, TAEB->vt, 1);
 
     # XXX: should this be each_adjacent_inclusive? consider teleports etc
     TAEB->each_adjacent(sub {
@@ -105,8 +130,13 @@ sub update {
     $old_level->step_off($old_x, $old_y) if defined($old_x);
     $level->step_on($self->x, $self->y);
 
+    $self->tilechange_l($tc_l);
+    $self->tilechange_r($tc_r);
+    $self->tilechange_t($tc_t);
+    $self->tilechange_b($tc_b);
+
     if ($tile_changed) {
-        $self->autoexplore;
+        $self->autoexplore($level == $old_level);
         $self->dungeon->current_level->detect_branch;
         TAEB->send_message('tile_changes');
     }
@@ -194,20 +224,20 @@ sub check_dlvl {
 sub autoexplore {
     my $self = shift;
     my $level = $self->dungeon->current_level;
+    my $can_optimise = shift || 0;
+    my $iterator = $can_optimise ? 'each_changed_tile_and_neighbors'
+                                 : 'each_tile';
 
-    for my $y (1 .. 21) {
-        TILE: for my $x (0 .. 79) {
-            my $tile = $level->at($x, $y);
-
-            if (!$tile->explored
-             && $tile->type ne 'rock'
-             && $tile->type ne 'unexplored') {
-                $tile->explored(1) unless $tile->any_adjacent(sub {
-                    shift->type eq 'unexplored'
-                });
-            }
+    $level->$iterator(sub {
+        my $tile = shift;
+        if (!$tile->explored
+            && $tile->type ne 'rock'
+            && $tile->type ne 'unexplored') {
+            $tile->explored(1) unless $tile->any_adjacent(sub {
+                shift->type eq 'unexplored'
+            });
         }
-    }
+    });
 }
 
 sub msg_dungeon_feature {

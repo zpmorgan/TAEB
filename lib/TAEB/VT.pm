@@ -8,9 +8,30 @@ has topline => (
     isa => 'Str',
 );
 
+has rows_changed => (
+    is  => 'rw',
+    isa => 'ArrayRef[Bool]',
+    default => sub { [] },
+);
+
 after process => sub {
     my $self = shift;
     $self->topline($self->row_plaintext(0));
+};
+
+around new => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $obj = $orig->($self);
+    $obj->callback_set('ROWCHANGE', sub {
+        # The number of the row changed is the third arg to the
+        # callback function.
+        # XXX Term::VT102::ZeroBased appears not to change the offset to
+        # zero-based here; this workaround (the -1) needs removal if and
+        # when Term::VT102::ZeroBased is fixed.
+        $obj->rows_changed->[$_[2]-1] = 1;
+    }, undef);
+    return $obj;
 };
 
 sub find_row {
@@ -113,7 +134,7 @@ sub row_color {
     } $attrs =~ m{..}g;
 }
 
-__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
 1;
 

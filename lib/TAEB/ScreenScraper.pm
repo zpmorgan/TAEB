@@ -437,7 +437,8 @@ our @msg_regex = (
     [
         qr/^You (?:see|feel) here (.*?)\./,
             ['floor_item', sub {
-                if (TAEB->current_tile->item_count == 1) {
+                if (defined TAEB->current_tile &&
+                    TAEB->current_tile->item_count == 1) {
                     my $item = TAEB->new_item($1);
                     if (@{TAEB->current_tile->items}[0]->maybe_is($item)) {
                         TAEB->log->scraper("Not updating the $item here ".

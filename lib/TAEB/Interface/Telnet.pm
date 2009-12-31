@@ -89,11 +89,52 @@ augment read => sub {
             $self->login;
         }
 
-        $self->sent_login(1);
-        $self->send_options;
+        # Now we need to eat up all the input so far, so that later when we
+        # wait for the options menu, we can be sure we've left the options menu
+        # We use a scratch buffer on the off-chance the text is split across
+        # two packets.
+        my $scratch = '';
 
-        # Play the game
-        $self->write('p');
+        1 until ($scratch .= $self->read) =~ /Logged in as:/;
+        # We need to grab the whole menu so we can look at it.
+        1 until ($scratch .= $self->read) =~ /q\) Quit/;
+
+        # We need to select which game to play on some servers,
+        # but not on others.
+        if ($scratch =~ m/p\) Play NetHack/) {
+            # NetHack played from the main menu
+            TAEB->log->interface("This server seems to play NetHack from ".
+                                 "the main menu.");
+            $self->sent_login(1);
+            $self->send_options;
+
+            # Play the game
+            $self->write('p');
+        } elsif ($scratch =~ /(\d)\) Go to NetHack/) {
+            # NetHack played from a submenu
+            # TODO: pick a particular version of NetHack if more than one is
+            # offered by the server in question
+            my $submenu = $1;
+            TAEB->log->interface("This server seems to play NetHack from ".
+                                 "submenu $submenu.");
+            $self->sent_login(1);
+
+            # Select submenu
+            $self->write($submenu);
+            # Absorb input until the submenu comes up. In particular, we need
+            # to absorb the "Logged in as:" so that send_options can tell
+            # that virus has quit.
+            $scratch = '';
+            1 until ($scratch .= $self->read) =~ /Edit options for/;
+
+            $self->send_options;
+
+            # Play the game. We're back on the game submenu now.
+            $self->write('p');
+        } else {
+            my $server = $self->server;
+            die "Could not figure out how server $server plays NetHack";
+        }
     }
 
     return $buffer;
@@ -152,13 +193,6 @@ sub telnet_negotiation {
 sub send_options {
     my $self = shift;
 
-    # Now we need to eat up all the input so far, so that later when we
-    # wait for the options menu, we can be sure we've left the options menu
-    # We use a scratch buffer on the off-chance the text is split across
-    # two packets.
-    my $scratch = '';
-
-    1 until ($scratch .= $self->read) =~ /Logged in as:/;
     if ($self->send_rcfile) {
         # Clear existing options
         $self->write(

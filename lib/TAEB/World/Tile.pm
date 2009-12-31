@@ -238,6 +238,7 @@ sub update {
     my $newglyph    = shift;
     my $color       = shift;
     my $oldtype     = $self->type;
+    my $oldglyph    = $self->glyph;
 
     # gas spore explosions should not update the map
     # XXX what's this for?  we don't run the AI until we've seen all
@@ -251,6 +252,10 @@ sub update {
     $self->update_lit;
 
     $self->invalidate_intrinsic_cost_cache;
+
+    # boulder messages
+    TAEB->announce('boulder_change', 'tile' => $self)
+        if $oldglyph eq '0' xor $newglyph eq '0';
 
     # dark rooms
     return if $self->glyph eq ' ' && $self->floor_glyph eq '.';
@@ -580,9 +585,11 @@ sub debug_line {
 sub try_monster {
     my ($self, $glyph, $color) = @_;
 
+    my $level = $self->level;
+
     # attempt to handle ghosts on the rogue level, which are always the
     # same glyphs as rocks. rogue level ignores your glyph settings.
-    if ($self->level->is_rogue && !TAEB->is_blind && $glyph eq ' ') {
+    if ($glyph eq ' ' && $level->is_rogue && !TAEB->is_blind) {
         return unless abs($self->x - TAEB->x) <= 1
                    && abs($self->y - TAEB->y) <= 1;
 
@@ -596,7 +603,7 @@ sub try_monster {
         $color = COLOR_GRAY;
     }
     else {
-        return unless $self->level->glyph_is_monster($glyph);
+        return unless $level->glyph_is_monster($glyph);
     }
 
     my $monster = TAEB::World::Monster->new(
@@ -606,7 +613,7 @@ sub try_monster {
     );
 
     $self->monster($monster);
-    $self->level->add_monster($monster);
+    $level->add_monster($monster);
 }
 
 before _clear_monster => sub {
