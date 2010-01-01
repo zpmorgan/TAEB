@@ -82,14 +82,14 @@ sub _read_attack_string {
         # Ignore the attacks of yellow and black lights, since they do
         # _large_ amounts of damage that's actually a duration (10d20
         # and 10d12 respectively).
-	next if $attack->{'type'} eq 'blind';
-	next if $attack->{'type'} eq 'hallucination';
+        next if $attack->{'type'} eq 'blind';
+        next if $attack->{'type'} eq 'hallucination';
 
         # Ignore non-melee
-	next if $attack->{'mode'} eq 'magic';
-	next if $attack->{'mode'} eq 'breathe';
-	next if $attack->{'mode'} eq 'spit';
-	next if $attack->{'mode'} eq 'gaze';
+        next if $attack->{'mode'} eq 'magic';
+        next if $attack->{'mode'} eq 'breathe';
+        next if $attack->{'mode'} eq 'spit';
+        next if $attack->{'mode'} eq 'gaze';
 
         # Ignore attacks that the player has res to
         next if $attack->{'type'} eq 'cold' && TAEB->cold_resistant;

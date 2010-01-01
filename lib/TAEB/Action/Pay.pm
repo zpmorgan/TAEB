@@ -27,7 +27,7 @@ sub respond_buy_item {
     }
 
     if (!blessed($self->item) &&
-	($self->item eq 'any' || $self->item eq 'all')) {
+        ($self->item eq 'any' || $self->item eq 'all')) {
         TAEB->log->action("Buying $item because we're buying everything.");
         return 'y';
     }

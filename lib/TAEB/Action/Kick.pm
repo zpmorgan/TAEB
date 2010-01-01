@@ -29,7 +29,7 @@ sub is_impossible {
         || TAEB->in_web
         || TAEB->is_wounded_legs
         || TAEB->is_levitating
-        || TAEB->burden_mod <= 0.5;	# Stressed or worse
+        || TAEB->burden_mod <= 0.5; # Stressed or worse
 }
 
 __PACKAGE__->meta->make_immutable;
