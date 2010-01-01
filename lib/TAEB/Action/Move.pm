@@ -41,8 +41,7 @@ around new => sub {
     elsif ($start eq '>') {
         $action = 'Descend';
     }
-
-    if (TAEB->current_tile->at_direction($start)->has_boulder) {
+    elsif (TAEB->current_tile->at_direction($start)->has_boulder) {
         $args{pushing} = 1;
     }
 
