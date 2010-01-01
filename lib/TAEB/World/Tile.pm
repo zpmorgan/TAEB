@@ -918,7 +918,7 @@ sub at_direction {
         else {
             my $error = sprintf "Tried to find the other side of %sstaircase",
                 $self->isa('TAEB::World::Tile::Stairs')
-                    ? "a non-" : "the wrong type of ";
+                    ? "the wrong type of " : "a non-";
             TAEB->log->level($error, level => 'error');
             return;
         }
