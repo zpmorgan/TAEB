@@ -17,9 +17,34 @@ sub command {
 
 sub respond_remove_what { shift->item->slot }
 
-sub done { shift->item->is_worn(0) }
+sub done {
+    my $self = shift;
+    $self->item->is_worn(0);
+    $self->item->is_cursed(0);
+}
 
-sub msg_cursed { shift->item->buc('cursed') }
+sub msg_cursed {
+    my $self = shift;
+    $self->item->buc('cursed');
+    $self->aborted(1);
+}
+
+sub exception_not_wearing {
+    my $self = shift;
+
+    $self->item->is_worn(0);
+
+    my $slot;
+    $slot = $self->item->subtype if $self->item->type eq 'armor';
+    if (defined ($slot)) {
+        my $clearer = "clear_$slot";
+        TAEB->equipment->$clearer;
+    }
+
+    TAEB->log->action("We are not wearing item " . $self->item);
+    $self->aborted(1);
+    return "\e";
+}
 
 __PACKAGE__->meta->make_immutable;
 
