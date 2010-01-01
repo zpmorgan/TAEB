@@ -539,6 +539,8 @@ sub change_draw_mode {
     $self->color_method($key) if $modes{$key}{color};
 
     $modes{$key}{immediate}($self) if $modes{$key}{immediate};
+
+    $self->requires_redraw(1);
 }
 
 subscribe step => sub {
