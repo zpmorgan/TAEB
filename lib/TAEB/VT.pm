@@ -27,7 +27,7 @@ sub BUILD {
         # XXX Term::VT102::ZeroBased appears not to change the offset to
         # zero-based here; this workaround (the -1) needs removal if and
         # when Term::VT102::ZeroBased is fixed.
-        $obj->rows_changed->[$_[2]-1] = 1;
+        $self->rows_changed->[$_[2]-1] = 1;
     }, undef);
 }
 
