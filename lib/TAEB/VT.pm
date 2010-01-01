@@ -19,11 +19,9 @@ after process => sub {
     $self->topline($self->row_plaintext(0));
 };
 
-around new => sub {
-    my $orig = shift;
+sub BUILD {
     my $self = shift;
-    my $obj = $orig->($self);
-    $obj->callback_set('ROWCHANGE', sub {
+    $self->callback_set('ROWCHANGE', sub {
         # The number of the row changed is the third arg to the
         # callback function.
         # XXX Term::VT102::ZeroBased appears not to change the offset to
@@ -31,8 +29,7 @@ around new => sub {
         # when Term::VT102::ZeroBased is fixed.
         $obj->rows_changed->[$_[2]-1] = 1;
     }, undef);
-    return $obj;
-};
+}
 
 sub find_row {
     my $self = shift;
@@ -134,7 +131,7 @@ sub row_color {
     } $attrs =~ m{..}g;
 }
 
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+__PACKAGE__->meta->make_immutable;
 
 1;
 
