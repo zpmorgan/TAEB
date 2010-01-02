@@ -16,7 +16,6 @@ sub repl {
     $ENV{PERL_RL} ||= $self->config->{readline}
         if $self->config && exists $self->config->{readline};
 
-    no warnings 'redefine';
     # using require doesn't call import, so no die handler is installed
     eval {
         local $SIG{__DIE__};

@@ -49,7 +49,7 @@ sub items {
     return map { $_->[0] } @{ $self->_item_metadata };
 }
 
-sub select {
+sub select { ## no critic (ProhibitBuiltinHomonyms)
     my $self = shift;
 
     return if $self->select_type eq 'none';

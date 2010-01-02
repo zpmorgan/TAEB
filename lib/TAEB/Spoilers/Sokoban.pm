@@ -555,7 +555,7 @@ sub next_sokoban_step {
 
     @current_boulder_locations = sort @current_boulder_locations;
 
-    if ((grep /\./, @current_boulder_locations) > 1) {
+    if ((grep { /\./ } @current_boulder_locations) > 1) {
         TAEB->log->spoiler(
             "This Sokoban puzzle has deviated from spoilers.",
             level => 'warning',

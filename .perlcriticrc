@@ -1,3 +1,11 @@
+severity = 4
+exclude = RequireFinalReturn RequireArgUnpacking ProhibitConstantPragma RequireBriefOpen
+
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Singleton
 
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Singleton
+
+[Variables::RequireLocalizedPunctuationVars]
+allow = %SIG %ENV $a $b

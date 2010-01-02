@@ -74,11 +74,11 @@ sub is_impossible {
 
 sub is_advisable {
     my $self = shift;
-    return not $self->is_impossible
-            || TAEB->is_blind
-            || TAEB->is_confused
-            || TAEB->is_stunned
-            || TAEB->is_hallucinating;
+    return not ($self->is_impossible
+             || TAEB->is_blind
+             || TAEB->is_confused
+             || TAEB->is_stunned
+             || TAEB->is_hallucinating);
 }
 
 __PACKAGE__->meta->make_immutable;

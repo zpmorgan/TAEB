@@ -98,9 +98,9 @@ sub update {
         # To save time, don't look for monsters in blank space, except
         # on the Rogue level. Likewise, . and # do not represent monsters.
         $tile->try_monster($glyph, $color)
-            unless $glyph eq ' ' && !$rogue
-                or $glyph eq '.' || $glyph eq '#'
-                or $Tx == $x && $Ty == $y;
+            unless ($glyph eq ' ' && !$rogue)
+                or ($glyph eq '.' || $glyph eq '#')
+                or ($Tx == $x && $Ty == $y);
 
         if ($glyph ne $tile->glyph || $color != $tile->color) {
             $tile_changed = 1;

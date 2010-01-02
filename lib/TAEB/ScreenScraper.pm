@@ -646,7 +646,7 @@ our @msg_regex = (
     ],
     [
         qr/^(.*?) (hits|misses)[.!]$/ =>
-            ['attacked' => sub { $1, $2 eq 'hits' } ],
+            ['attacked' => sub { ($1, $2 eq 'hits') } ],
     ],
     [
         qr/^Your .* get new energy\.$/ =>
@@ -1215,7 +1215,7 @@ sub handle_menus {
     }
     elsif (TAEB->topline =~ /What would you like to drop\?/) {
         # this one is special: it'll handle updating the inventory
-        my %dont_have = map { $_, 1 } 'a' .. 'z', 'A' .. 'Z';
+        my %dont_have = map { ($_, 1) } 'a' .. 'z', 'A' .. 'Z';
 
         $selector = sub {
             my $slot = shift;

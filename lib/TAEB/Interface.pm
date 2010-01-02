@@ -8,7 +8,7 @@ has read_iterations => (
     default => 1,
 );
 
-sub read {
+sub read { ## no critic (ProhibitBuiltinHomonyms)
     my $self = shift;
 
     my $input = join '',
@@ -18,7 +18,7 @@ sub read {
     return $input;
 }
 
-sub write {
+sub write { ## no critic (ProhibitBuiltinHomonyms)
     my $self = shift;
     my $text = join '', @_;
 

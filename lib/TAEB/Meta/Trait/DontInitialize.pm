@@ -1,9 +1,7 @@
 package TAEB::Meta::Trait::DontInitialize;
 use Moose::Role;
+Moose::Util::meta_attribute_alias('TAEB::DontInitialize');
 
 no Moose::Role;
-
-package Moose::Meta::Attribute::Custom::Trait::TAEB::DontInitialize;
-sub register_implementation { 'TAEB::Meta::Trait::DontInitialize' }
 
 1;

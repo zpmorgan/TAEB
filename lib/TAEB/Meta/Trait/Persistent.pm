@@ -1,5 +1,6 @@
 package TAEB::Meta::Trait::Persistent;
 use Moose::Role;
+Moose::Util::meta_attribute_alias('TAEB::Persistent');
 
 before _process_options => sub {
     my ($class, $name, $options) = @_;
@@ -34,9 +35,6 @@ before attach_to_class => sub {
 };
 
 no Moose::Role;
-
-package Moose::Meta::Attribute::Custom::Trait::TAEB::Persistent;
-sub register_implementation { 'TAEB::Meta::Trait::Persistent' }
 
 1;
 

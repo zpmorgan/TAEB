@@ -55,7 +55,7 @@ sub said {
     return $self->response_to($args{body});
 }
 
-sub log {
+sub log { ## no critic (ProhibitBuiltinHomonyms)
     my $self = shift;
     for (@_) {
         chomp;

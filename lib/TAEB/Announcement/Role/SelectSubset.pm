@@ -15,7 +15,7 @@ has _is_selected => (
     default => sub { [ 0 x shift->items ] },
 );
 
-sub select {
+sub select { ## no critic (ProhibitBuiltinHomonyms)
     my $self = shift;
 
     for my $selection (@_) {
