@@ -1,6 +1,5 @@
 package TAEB::Senses;
 use TAEB::OO;
-use Memoize;
 
 has name => (
     is  => 'rw',
@@ -370,7 +369,6 @@ sub statuses {
     }
     return @statuses;
 }
-memoize('statuses');
 
 sub resistances {
     my $self = shift;
