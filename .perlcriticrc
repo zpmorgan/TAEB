@@ -8,4 +8,4 @@ equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Sin
 equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Singleton
 
 [Variables::RequireLocalizedPunctuationVars]
-allow = %SIG %ENV $a $b
+allow = %SIG %ENV $a $b $|
