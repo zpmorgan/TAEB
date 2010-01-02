@@ -17,7 +17,7 @@ subscribe got_item => sub {
     my $event = shift;
 
     # what about stacks?
-    TAEB->send_message(remove_floor_item => $event->item);
+    TAEB->send_message(remove_floor_item => $event->item, $self->starting_tile);
 };
 
 sub begin_select_pickup {
