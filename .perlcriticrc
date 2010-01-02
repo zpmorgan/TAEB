@@ -1,5 +1,5 @@
 severity = 4
-exclude = RequireFinalReturn RequireArgUnpacking ProhibitConstantPragma RequireBriefOpen
+exclude = RequireFinalReturn RequireArgUnpacking ProhibitConstantPragma RequireBriefOpen ProhibitNoWarnings
 
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Singleton
