@@ -319,7 +319,11 @@ sub is_walkable {
     return 0 if $self->has_boulder;
 
     # monsters are not pathable!
-    return 0 if $self->has_monster;
+    if ($self->has_monster) {
+        # XXX: but non-adjacent shks are, for now
+        return $self->monster->is_shk
+            && ($self->x - TAEB->x > 1 || $self->y - TAEB->y > 1);
+    }
 
     # traps are unpathable in Sokoban
     return 0 if $self->type eq 'trap'
