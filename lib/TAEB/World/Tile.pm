@@ -322,7 +322,7 @@ sub is_walkable {
     if ($self->has_monster) {
         # XXX: but non-adjacent shks are, for now
         return $self->monster->is_shk
-            && ($self->x - TAEB->x > 1 || $self->y - TAEB->y > 1);
+            && (abs($self->x - TAEB->x) > 1 || abs($self->y - TAEB->y) > 1);
     }
 
     # traps are unpathable in Sokoban
