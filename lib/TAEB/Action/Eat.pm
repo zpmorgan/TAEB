@@ -9,17 +9,11 @@ has '+food' => (
     required => 1,
 );
 
-has tile => (
-    is      => 'ro',
-    isa     => 'TAEB::World::Tile',
-    default => sub { TAEB->current_tile },
-);
-
 sub respond_eat_ground {
     my $self = shift;
     my $floor = shift;
 
-    my $floor_item = TAEB->current_tile->find_item($floor);
+    my $floor_item = $self->starting_tile->find_item($floor);
 
     # no, we want to eat something in our inventory
     return 'n' unless $self->food == $floor_item;
@@ -65,7 +59,7 @@ sub done {
     else {
         #This doesn't work well with a stack of corpses on the floor
         #because maybe_is used my remove_floor_item tries to match quantity
-        TAEB->send_message(remove_floor_item => $item, $self->tile);
+        TAEB->send_message(remove_floor_item => $item, $self->starting_tile);
     }
 
     my $old_nutrition = TAEB->nutrition;
@@ -79,7 +73,7 @@ sub edible_items {
     my $self = shift;
 
     return grep { $self->can_eat($_) }
-           TAEB->current_tile->items,
+           $self->starting_tile->items,
            TAEB->inventory;
 }
 
