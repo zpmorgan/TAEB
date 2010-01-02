@@ -487,7 +487,7 @@ sub next_sokoban_step {
     my $tile_from = TAEB->current_tile;
     if ($tile_from->level != $level) {
         $tile_from = $level->exit_towards(TAEB->current_level);
-        return undef unless $tile_from; # can't path to Sokoban
+        return unless $tile_from; # can't path to Sokoban
     }
 
     my ($variant, $left, $top) = $self->recognize_sokoban_variant($level);

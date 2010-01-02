@@ -9,20 +9,9 @@ use File::Spec;
 use File::HomeDir;
 use Cwd 'abs_path';
 
-$ENV{TAEBDIR} ||= do {
-    File::Spec->catdir(File::HomeDir->my_home, '.taeb');
-};
-
-$ENV{TAEBDIR} = abs_path($ENV{TAEBDIR});
-
--d $ENV{TAEBDIR} or mkdir($ENV{TAEBDIR}, 0700) or do {
-    local $SIG{__DIE__} = 'DEFAULT';
-    die "Please create a $ENV{TAEBDIR} directory.\n";
-};
-
 sub taebdir_file {
     my $self = shift;
-    File::Spec->catfile($ENV{TAEBDIR}, @_)
+    File::Spec->catfile($self->taebdir, @_)
 }
 
 has contents => (
@@ -33,6 +22,21 @@ has contents => (
             ai        => 'Demo',
             interface => 'Local',
             display   => 'Curses',
+        };
+    },
+);
+
+has taebdir => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => sub {
+        my $taebdir = $ENV{TAEBDIR};
+        $taebdir ||= File::Spec->catdir(File::HomeDir->my_home, '.taeb');
+        $taebdir = abs_path($taebdir);
+        return $taebdir if -d $taebdir;
+        mkdir $taebdir, 0700 or do {
+            local $SIG{__DIE__} = 'DEFAULT';
+            die "Please create a $taebdir directory.\n";
         };
     },
 );
@@ -65,11 +69,12 @@ sub BUILD {
                 @new_files = ($c);
             }
             push @config, map {
-                s{^~(\w+)}{File::HomeDir->users_home($1)}e;
-                s{^~}{File::HomeDir->my_home}e;
-                File::Spec->file_name_is_absolute($_)
-                    ? $_
-                    : File::Spec->catfile($ENV{TAEBDIR}, $_);
+                my $file = $_;
+                $file =~ s{^~(\w+)}{File::HomeDir->users_home($1)}e;
+                $file =~ s{^~}{File::HomeDir->my_home}e;
+                File::Spec->file_name_is_absolute($file)
+                    ? $file
+                    : File::Spec->catfile($self->taebdir, $file);
             } @new_files;
         }
     }

@@ -51,7 +51,7 @@ sub maybe_rotted {
 
     return 1 if $rotted_low > 5;
     return 0 if $rotted_high <= 5;
-    return undef;
+    return;
 }
 
 sub would_be_rotted {

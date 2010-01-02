@@ -48,10 +48,10 @@ sub taebify {
     );
 
     # add overloading to taeb_class
-    eval "
+    eval <<OVERLOAD; ## no critic (ProhibitStringyEval)
         package $taeb_class;
         use overload \%TAEB::Meta::Overload::default;
-    ";
+OVERLOAD
     die $@ if $@;
 }
 

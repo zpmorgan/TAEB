@@ -385,7 +385,7 @@ sub average_melee_damage {
 sub average_actions_to_kill {
     my $self = shift;
     my $potential = shift;
-    return undef if !($self->possibilities);
+    return unless $self->possibilities;
     if (!defined $potential) {
     # TODO: allow for monster resistances
         my $weapon = TAEB->inventory->equipment->weapon;

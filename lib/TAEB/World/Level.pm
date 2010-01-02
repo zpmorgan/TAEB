@@ -193,7 +193,7 @@ sub at_safe {
         return $self->at($cartographer->x, $cartographer->y) unless @_;
     }
     my ($x, $y) = @_;
-    return undef unless $self->is_on_map($x, $y);
+    return unless $self->is_on_map($x, $y);
     return $self->{tiles}->[$y][$x];
 }
 
