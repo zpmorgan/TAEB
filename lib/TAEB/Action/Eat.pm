@@ -70,15 +70,15 @@ sub done {
 }
 
 sub edible_items {
-    my $self = shift;
+    my $class = shift;
 
-    return grep { $self->can_eat($_) }
-           $self->starting_tile->items,
+    return grep { $class->can_eat($_) }
+           TAEB->current_tile->items,
            TAEB->inventory;
 }
 
 sub can_eat {
-    my $self = shift;
+    my $class = shift;
     my $item = shift;
 
     return 0 unless $item->type eq 'food';
