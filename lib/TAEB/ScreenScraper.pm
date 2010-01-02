@@ -1,8 +1,9 @@
 package TAEB::ScreenScraper;
 use TAEB::OO;
-use TAEB::Util qw/crow_flies/;
+use TAEB::Util qw/crow_flies natatime/;
 use TAEB::Announcement;
 use NetHack::Menu;
+use Try::Tiny;
 
 our %msg_string = (
     "You are blinded by a blast of light!" =>
@@ -765,10 +766,11 @@ our @god_anger = (
     qr/^Suddenly a bolt of lightning comes down at you from the heavens!$/ => 10000,
 );
 
-for (my $i = 0; $i < @god_anger; $i += 2) {
+my $it = natatime(2, @god_anger);
+while (my ($regex, $anger) = $it->()) {
     push @msg_regex, [
-        $god_anger[$i],
-        ['god_angry' => $god_anger[$i+1]],
+        $regex,
+        ['god_angry' => $anger],
     ];
 }
 
@@ -897,7 +899,7 @@ sub scrape {
 
     $self->check_cycling;
 
-    eval {
+    try {
         # You don't have that object!
         $self->handle_exceptions;
 
@@ -924,16 +926,17 @@ sub scrape {
 
         # publish messages for all_messages
         $self->send_messages;
+    }
+    catch {
+        if (/^Recursing screenscraper/) {
+            @_ = 'TAEB';
+            goto TAEB->can('process_input');
+        }
+        else {
+            local $SIG{__DIE__}; # don't need to log again
+            die "$_\n";
+        }
     };
-
-    if (($@ || '') =~ /^Recursing screenscraper/) {
-        @_ = 'TAEB';
-        goto TAEB->can('process_input');
-    }
-    elsif ($@) {
-        local $SIG{__DIE__}; # don't need to log again
-        die "$@\n";
-    }
 }
 
 sub check_cycling {

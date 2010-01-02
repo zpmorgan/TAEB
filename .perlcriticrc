@@ -1,5 +1,8 @@
-severity = 4
-exclude = RequireFinalReturn RequireArgUnpacking ProhibitConstantPragma RequireBriefOpen ProhibitNoWarnings
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 80
 
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Singleton
@@ -9,3 +12,41 @@ equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Sin
 
 [Variables::RequireLocalizedPunctuationVars]
 allow = %SIG %ENV $a $b $|
+
+[BuiltinFunctions::ProhibitUniversalCan]
+severity = 5
+[BuiltinFunctions::ProhibitUniversalIsa]
+severity = 5
+[ClassHierarchies::ProhibitExplicitISA]
+severity = 5
+[CodeLayout::ProhibitHardTabs]
+severity = 5
+[ErrorHandling::RequireCheckingReturnValueOfEval]
+severity = 5
+[Modules::RequireExplicitPackage]
+severity = 5
+[Objects::ProhibitIndirectSyntax]
+severity = 5
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+severity = 5
+[ControlStructures::ProhibitCStyleForLoops]
+severity = 3
+[InputOutput::RequireBriefOpen]
+severity = 3
+[Modules::ProhibitAutomaticExportation]
+severity = 3
+[TestingAndDebugging::ProhibitNoWarnings]
+severity = 3
+[BuiltinFunctions::ProhibitLvalueSubstr]
+severity = 2
+[ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+severity = 2
+
+[-ControlStructures::ProhibitCascadingIfElse]
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::RequireFinalReturn]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::RequireQuotedHeredocTerminator]
+[-Variables::RequireInitializationForLocalVars]

@@ -1,6 +1,7 @@
 package TAEB::Publisher;
 use TAEB::OO;
 use Set::Object;
+use TAEB::Util qw(natatime);
 
 has _subscribers => (
     isa     => 'Set::Object',
@@ -144,10 +145,10 @@ sub _get_generic_response {
         @_,
     );
 
-    for (my $i = 0; $i < @{ $args{sets} }; $i += 2) {
+    my $it = natatime(2, @{ $args{sets} });
+    while (my ($re, $name) = $it->()) {
         my $matched = 0;
         my @captures;
-        my ($re, $name) = @{ $args{sets} }[$i, $i + 1];
 
         for my $responder (@{ $args{responders} }) {
             if (my $code = $responder->can("$args{method}_$name")) {

@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use lib 'lib';
 use Getopt::Long;
+use Try::Tiny;
 
 sub print_usage {
     my ($exit_val) = shift;
@@ -79,7 +80,7 @@ $SIG{USR2} = sub {
 $| = 1;
 
 while (1) {
-    eval {
+    try {
         local $SIG{INT} = sub { $loop = 0; die "Interrupted.\n" };
         my $report = TAEB->play;
         print $report->as_string;

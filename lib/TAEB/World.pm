@@ -48,11 +48,12 @@ sub taebify {
     );
 
     # add overloading to taeb_class
-    eval <<OVERLOAD; ## no critic (ProhibitStringyEval)
+    my $failed = not eval <<OVERLOAD; ## no critic (ProhibitStringyEval)
         package $taeb_class;
         use overload \%TAEB::Meta::Overload::default;
+        1;
 OVERLOAD
-    die $@ if $@;
+    die $@ if $failed;
 }
 
 __PACKAGE__->load_world_classes;

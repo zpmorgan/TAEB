@@ -5,6 +5,7 @@ use TAEB::Util qw/:colors tile_types item_menu/;
 use TAEB::OO;
 
 use Log::Dispatch::Null;
+use Try::Tiny;
 
 use TAEB::Config;
 use TAEB::Display::Curses;
@@ -301,7 +302,8 @@ sub next_action {
 sub iterate {
     my $self = shift;
 
-    eval {
+    my $report;
+    try {
         $self->human_input;
 
         unless ($self->paused) {
@@ -318,24 +320,23 @@ sub iterate {
             $self->redraw;
             $self->display_topline;
         }
-    };
-
-    if ($@) {
+    }
+    catch {
         $self->display->deinitialize;
 
         local $SIG{__DIE__};
-        die $@ unless $@ =~ /^The\ game\ has\ ended\.
+        die $_ unless $_ =~ /^The\ game\ has\ ended\.
                              |The\ game\ has\ been\ saved\.
                              |The\ game\ could\ not\ start\./x;
 
-        return $self->state eq 'unable_to_login'
-             ? TAEB::Announcement::Report::CouldNotStart->new
-             : $self->state eq 'dying'
-             ? $self->death_report
-             : TAEB::Announcement::Report::Saved->new;
-    }
+        $report = $self->state eq 'unable_to_login'
+                ? TAEB::Announcement::Report::CouldNotStart->new
+                : $self->state eq 'dying'
+                ? $self->death_report
+                : TAEB::Announcement::Report::Saved->new;
+    };
 
-    return;
+    return $report;
 }
 
 # Runs our action in $self->action, cleanly.
@@ -362,7 +363,7 @@ sub handle_playing {
         return;
     }
 
-    eval {
+    my $run_action = try {
         local $SIG{__DIE__} = sub {
             my ($message) = @_;
 
@@ -382,9 +383,11 @@ sub handle_playing {
         };
 
         $self->action($self->next_action);
+
+        1;
     };
 
-    $self->run_action unless $@;
+    $self->run_action if $run_action;
 }
 
 sub handle_human_override {

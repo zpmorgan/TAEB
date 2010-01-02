@@ -1,5 +1,6 @@
 package TAEB::Interface::SSH;
 use TAEB::OO;
+use Try::Tiny;
 
 use constant ping_wait => .3;
 
@@ -30,7 +31,7 @@ sub _build_pty {
     $pty->spawn('ssh', $self->server, '-l', $self->account);
 
     alarm 20;
-    eval {
+    try {
         local $SIG{ALRM} = sub { die "timeout" };
 
         my $output = '';
@@ -41,9 +42,10 @@ sub _build_pty {
                 last;
             }
         }
+    }
+    catch {
+        die "Died while waiting for password prompt: $_\n";
     };
-
-    die "Died while waiting for password prompt: $@\n" if $@;
 
     $pty->write($self->password . "\n\n", 0);
 

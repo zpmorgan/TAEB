@@ -1,5 +1,6 @@
 package TAEB::Debug::Console;
 use TAEB::OO;
+use Try::Tiny;
 with 'TAEB::Role::Config';
 
 subscribe keypress => sub {
@@ -17,22 +18,25 @@ sub repl {
         if $self->config && exists $self->config->{readline};
 
     # using require doesn't call import, so no die handler is installed
-    eval {
+    my $loaded = try {
         local $SIG{__DIE__};
         require Carp::REPL;
-    };
-
-    if ($@ && @_ && defined($_[0])) {
-        # We're dropping into the REPL because of an error from somewhere,
-        # but Carp::REPL doesn't load (not installed?).  Report the actual
-        # error.
-        die @_;
-    } elsif ($@) {
-        # Otherwise, Carp::REPL just didn't load, so let the user know what's
-        # up.
-        TAEB->complain($@);
-        return;
+        1;
     }
+    catch {
+        if ($_ && @_ && defined($_[0])) {
+            # We're dropping into the REPL because of an error from somewhere,
+            # but Carp::REPL doesn't load (not installed?).  Report the actual
+            # error.
+            die @_;
+        } else {
+            # Otherwise, Carp::REPL just didn't load, so let the user know
+            # what's up.
+            TAEB->complain($_);
+        }
+        0;
+    };
+    return unless $loaded;
 
     TAEB->display->deinitialize;
 
@@ -46,7 +50,7 @@ sub repl {
         . "\e[1;37m+"
         . "\e[m\n";
 
-    eval {
+    try {
         local $SIG{__WARN__};
         local $SIG{__DIE__};
         local $SIG{INT} = sub { die "Interrupted." };
