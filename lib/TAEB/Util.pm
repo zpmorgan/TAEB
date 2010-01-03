@@ -1,6 +1,7 @@
 package TAEB::Util;
 use strict;
 use warnings;
+use TAEB::Util::Pair;
 
 use Carp 'confess';
 
