@@ -5,10 +5,10 @@ allow_leading_tabs = 0
 minimum_regex_length_to_complain_about = 80
 
 [TestingAndDebugging::RequireUseStrict]
-equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Singleton
+equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Singleton Moose::Exporter
 
 [TestingAndDebugging::RequireUseWarnings]
-equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Singleton
+equivalent_modules = TAEB::OO TAEB::Test MooseX::Role::Parameterized MooseX::Singleton Moose::Exporter
 
 [Variables::RequireLocalizedPunctuationVars]
 allow = %SIG %ENV $a $b $|
