@@ -11,9 +11,16 @@ use TAEB::Meta::Trait::DontInitialize;
 use TAEB::Meta::Types;
 use TAEB::Meta::Overload;
 
-my ($moose_import, $moose_unimport) = Moose::Exporter->build_import_methods(
+my ($import, $unimport, $init_meta) = Moose::Exporter->build_import_methods(
     also      => ['Moose', 'MooseX::ClassAttribute'],
     with_meta => ['extends', 'subscribe'],
+    base_class_roles => [
+        'TAEB::Role::Initialize',
+        'TAEB::Role::Subscription',
+        # the memory leak doesn't exist in 5.8, and will (hopefully) be fixed
+        # by the 5.10.1 release
+        $] == 5.010 ? ('TAEB::Role::WeakenFix') : (),
+    ],
 );
 
 # make sure using extends doesn't wipe out our base class roles
@@ -55,29 +62,15 @@ sub subscribe {
 }
 
 sub init_meta {
-    shift;
-    my %options = @_;
+    my ($package, %options) = @_;
     Moose->init_meta(%options);
-    my @base_class_roles = (
-        'TAEB::Role::Initialize',
-        'TAEB::Role::Subscription',
-    );
-    # the memory leak doesn't exist in 5.8, and will (hopefully) be fixed by
-    # the 5.10.1 release
-    push @base_class_roles, 'TAEB::Role::WeakenFix' if $] == 5.010;
-    Moose::Util::MetaRole::apply_base_class_roles(
-        for_class => $options{for_class},
-        roles     => \@base_class_roles,
-    );
     Moose::Util::MetaRole::apply_metaclass_roles(
         for_class                 => $options{for_class},
-        #metaclass_roles           => ['MooseX::NonMoose::Meta::Role::Class'],
-        #constructor_class_roles   => ['MooseX::NonMoose::Meta::Role::Constructor'],
         $options{for_class} =~ /^TAEB::Action/ ?
             (attribute_metaclass_roles => ['TAEB::Meta::Trait::Provided'])
           : (),
     );
-    return $options{for_class}->meta;
+    goto $init_meta;
 }
 
 sub import {
@@ -86,12 +79,12 @@ sub import {
         -cleanee => $caller,
     );
 
-    goto $moose_import;
+    goto $import;
 }
 
 sub unimport {
     warn "no TAEB::OO is no longer necessary";
-    goto $moose_unimport;
+    goto $unimport;
 }
 
 1;
