@@ -1,5 +1,5 @@
 package TAEB::Util::Pair;
-use TAEB::OO;
+use Moose;
 
 has name => (
     is       => 'ro',
@@ -21,4 +21,6 @@ use overload (
 );
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
+
 1;
