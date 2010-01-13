@@ -127,8 +127,7 @@ class_has dungeon => (
     lazy    => 1,
     default => sub {
         my $self = shift;
-        return TAEB::World::Dungeon->new if $self->new_game || !TAEB->has_dump;
-        return delete $self->persistent_dump->{dungeon};
+        return TAEB::World::Dungeon->new;
     },
     handles => sub {
         my ($attr, $dungeon) = @_;
@@ -169,8 +168,7 @@ class_has senses => (
     isa     => 'TAEB::Senses',
     default => sub {
         my $self = shift;
-        return TAEB::Senses->new if $self->new_game || !TAEB->has_dump;
-        return delete $self->persistent_dump->{senses};
+        return TAEB::Senses->new;
     },
     lazy    => 1,
     handles => qr/^(?!_check_|msg_|update)/,
@@ -182,8 +180,7 @@ class_has inventory => (
     lazy    => 1,
     default => sub {
         my $self = shift;
-        return TAEB::World::Inventory->new if $self->new_game || !TAEB->has_dump;
-        return delete $self->persistent_dump->{inventory};
+        return TAEB::World::Inventory->new;
     },
     handles => {
         find_item => 'find',
@@ -196,8 +193,7 @@ class_has spells => (
     lazy    => 1,
     default => sub {
         my $self = shift;
-        return TAEB::World::Spells->new if $self->new_game || !TAEB->has_dump;
-        return delete $self->persistent_dump->{spells};
+        return TAEB::World::Spells->new;
     },
     handles => {
         find_spell    => 'find',
@@ -226,8 +222,7 @@ class_has knowledge => (
     lazy    => 1,
     default => sub {
         my $self = shift;
-        return TAEB::Knowledge->new if $self->new_game || !TAEB->has_dump;
-        return delete $self->persistent_dump->{knowledge};
+        return TAEB::Knowledge->new;
     },
 );
 
@@ -322,10 +317,10 @@ sub handle_logging_in {
     elsif ($self->topline =~ qr/Restoring save file\.\./) {
         $self->info("We are now in NetHack, restoring a save file.");
         $self->write(' ');
-        $self->new_game(0);
+        #$self->new_game(0);
     }
     elsif ($self->topline =~ qr/, welcome( back)? to NetHack!/) {
-        $self->new_game($1 ? 0 : 1);
+        #$self->new_game($1 ? 0 : 1);
         $self->enqueue_message('check');
         $self->enqueue_message('game_started');
         $self->state('playing');
