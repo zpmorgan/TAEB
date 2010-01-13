@@ -1,0 +1,13 @@
+*.swp
+MANIFEST
+MANIFEST.bak
+META.yml
+Makefile
+Makefile.old
+SIGNATURE
+blib/
+extlib/
+lib/local/lib.pm
+inc/
+pm_to_blib
+TAEB-*
