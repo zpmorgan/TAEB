@@ -78,6 +78,19 @@ sub tile {
     return $self->level->at($self->x, $self->y);
 }
 
+sub _change_level_command {
+    my $self      = shift;
+    my $direction = shift;
+
+    if ($self->tile->isa('TAEB::World::Tile::Stairs') && $self->tile->known_other_side) {
+        my $other_level = $self->tile->other_side->level;
+        $self->z_with_branch($other_level->z, $other_level);
+    }
+    else {
+        $self->z_with_branch($self->z + $direction);
+    }
+}
+
 # Commands should return true if they need to force a redraw, or undef
 # if they are a terminator.
 
@@ -91,8 +104,8 @@ my %normal_commands = (
 
     (map { $_ => sub { undef } } "\e", "\n", ";", ".", " ", "q", "Q"),
 
-    '<' => sub { my $self = shift; $self->z_with_branch($self->z - 1); 1 },
-    '>' => sub { my $self = shift; $self->z_with_branch($self->z + 1); 1 },
+    '<' => sub { shift->_change_level_command(-1); 1 },
+    '>' => sub { shift->_change_level_command(+1); 1 },
     'v' => sub { shift->inc_z_index(+1); 1 },
     'i' => sub {
         my $tile = shift->tile;
