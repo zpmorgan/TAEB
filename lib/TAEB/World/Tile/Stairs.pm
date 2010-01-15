@@ -24,7 +24,7 @@ override debug_color => sub {
          : super;
 };
 
-override change_type => sub {
+before change_type => sub {
     my $self = shift;
     my $newtype = shift;
 
@@ -36,9 +36,6 @@ override change_type => sub {
     if ($newtype ne 'stairsup' && $newtype ne 'stairsdown') {
         $self->other_side->clear_other_side if $self->known_other_side;
     }
-
-    # Once we've done that, call the original procedure.
-    super;
 };
 
 __PACKAGE__->meta->make_immutable;
