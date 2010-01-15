@@ -18,9 +18,15 @@ for my $name (qw/x y z z_index/) {
 }
 
 has topline => (
-    isa => 'Maybe[Str]',
-    is  => 'rw',
+    isa        => 'Str',
+    is         => 'rw',
+    lazy_build => 1,
 );
+
+sub _build_topline {
+    my $self = shift;
+    return $self->tile->debug_line;
+}
 
 sub levels_here {
     my $self = shift;
@@ -126,14 +132,14 @@ sub activate {
 
     COMMAND: while (1) {
         TAEB->display_topline($self->topline);
+        $self->clear_topline;
 
         TAEB->redraw(level => $self->level,
             botl => "Displaying " . $self->level) if $redraw;
 
         TAEB->place_cursor($self->x, $self->y);
 
-        my $c  = TAEB->get_key;
-        $self->topline(undef);
+        my $c = TAEB->get_key;
 
         if ($commands{$c}) {
             $redraw = $commands{$c}->($self);
@@ -145,9 +151,6 @@ sub activate {
 
         $self->x($self->x % 80);
         $self->y(($self->y-1)%21+1);
-
-        $self->topline($self->tile->debug_line)
-            unless defined $self->topline;
     }
 
     TAEB->redraw;
