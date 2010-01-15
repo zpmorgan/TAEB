@@ -82,7 +82,7 @@ sub _change_level_command {
     my $self      = shift;
     my $direction = shift;
 
-    if ($self->tile->isa('TAEB::World::Tile::Stairs') && $self->tile->known_other_side) {
+    if ($self->tile->does('TAEB::World::Tile::Role::LevelChanger') && $self->tile->other_side_known) {
         my $other_level = $self->tile->other_side->level;
         $self->z_with_branch($other_level->z, $other_level);
     }
