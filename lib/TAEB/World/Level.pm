@@ -73,8 +73,13 @@ has monsters => (
 );
 
 has turns_spent_on => (
-    metaclass => 'Counter',
+   #metaclass => 'Counter',
+    traits => ['Counter'],
     is        => 'ro',
+    default => 0,
+    handles => {
+       inc_turns_spent_on => 'inc',
+    },
 );
 
 has pickaxe => (
