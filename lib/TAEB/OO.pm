@@ -64,10 +64,11 @@ sub subscribe {
 sub init_meta {
     my ($package, %options) = @_;
     Moose->init_meta(%options);
-    Moose::Util::MetaRole::apply_metaclass_roles(
-        for_class                 => $options{for_class},
+    Moose::Util::MetaRole::apply_metaroles(
+        for                   => $options{for_class},
         $options{for_class} =~ /^TAEB::Action/ ?
-            (attribute_metaclass_roles => ['TAEB::Meta::Trait::Provided'])
+            (class_metaroles => { attribute => ['TAEB::Meta::Trait::Provided'] } )
+            # (attribute_metaclass_roles => ['TAEB::Meta::Trait::Provided'])
           : (),
     );
     goto $init_meta;
