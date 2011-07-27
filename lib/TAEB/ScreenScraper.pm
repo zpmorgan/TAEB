@@ -877,6 +877,7 @@ has parsed_messages => (
 has calls_this_turn => (
     traits  => ['Counter'],
     is      => 'ro',
+    default => 0,
     handles => {
         inc_calls_this_turn   => 'inc',
         reset_calls_this_turn => 'reset',
