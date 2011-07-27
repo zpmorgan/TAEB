@@ -7,11 +7,7 @@ has 'provided' => (
     default => 0,
 );
 
-around legal_options_for_inheritance => sub {
-    my $orig = shift;
-    my $self = shift;
-    return ('provided', $self->$orig(@_));
-};
+sub legal_options_for_inheritance { 'provided' }
 
 no Moose::Role;
 
