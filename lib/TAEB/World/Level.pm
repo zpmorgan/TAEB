@@ -73,7 +73,6 @@ has monsters => (
 );
 
 has turns_spent_on => (
-   #metaclass => 'Counter',
     traits => ['Counter'],
     is        => 'ro',
     default => 0,

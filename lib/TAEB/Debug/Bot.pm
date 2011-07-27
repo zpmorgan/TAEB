@@ -11,9 +11,12 @@ has paused => (
 );
 
 has step => (
-    metaclass => 'Counter',
+    traits => ['Counter'],
     is      => 'ro',
     default => -1,
+    handles => {
+       inc_step => 'inc',
+    },
     trigger => sub {
         my $self = shift;
         my $val = shift;
